@@ -1,5 +1,5 @@
-import { RetroButton } from './RetroButton';
-import { ScrollReveal } from './ScrollReveal';
+import RetroButton from './RetroButton';
+import ScrollReveal from './ScrollReveal';
 
 export default function Footer() {
   return (
