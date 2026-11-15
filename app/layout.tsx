@@ -2,6 +2,7 @@ import "./globals.css";
 import { Providers } from "./providers";
 import Navbar from "@/components/Navbar";
 import ChatWidget from "@/components/ChatWidget";
+import Footer from "@/components/Footer";
 
 export const metadata = {
     title: "SoleFix — Shop & Repair Shoes",
@@ -22,6 +23,7 @@ export default function RootLayout({
                     <main className="min-h-screen">{children}</main>
                     <ChatWidget />
                 </Providers>
+        <Footer />
             </body>
         </html>
     );
