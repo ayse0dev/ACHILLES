@@ -1,8 +1,12 @@
 import Airtable from "airtable";
 
-export const base = new Airtable({
-    apiKey: process.env.AIRTABLE_TOKEN,
-}).base(process.env.AIRTABLE_BASE_ID!);
+// Lazy getter prevents build-time crashes if environment variables are not loaded during build evaluation
+export const base: Airtable.Base = ((tableName: string) => {
+    const token = process.env.AIRTABLE_TOKEN || "missing_token";
+    const baseId = process.env.AIRTABLE_BASE_ID || "missing_base_id";
+    const airtable = new Airtable({ apiKey: token });
+    return airtable.base(baseId)(tableName);
+}) as unknown as Airtable.Base;
 
 export interface ProductFields {
     Name: string;
