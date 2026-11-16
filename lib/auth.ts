@@ -51,12 +51,11 @@ export const authOptions: NextAuthOptions = {
                     role: normalizeRole(user.Role),
                 };
 
-                if (credentials.otp) {
-                    const validOtp = await verifyOTP(credentials.email, credentials.otp);
-                    return validOtp ? sessionUser : null;
-                }
+                if (!credentials.password || !credentials.otp || !user.PasswordHash) return null;
 
-                if (!credentials.password || !user.PasswordHash) return null;
+                const validOtp = await verifyOTP(credentials.email, credentials.otp);
+                if (!validOtp) return null;
+
                 const valid = await bcrypt.compare(credentials.password, user.PasswordHash);
                 return valid ? sessionUser : null;
             },
