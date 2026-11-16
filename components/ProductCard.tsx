@@ -31,7 +31,7 @@ export default function ProductCard({ product, showPrice = true }: { product: Pr
                     <p className="text-[11px] font-bold uppercase tracking-wider text-ink/50">{product.category}</p>
                 )}
                 <p className="font-bold text-base leading-snug group-hover:underline">{product.name}</p>
-                {showPrice && <p className="font-bold text-purple">${product.price.toFixed(2)}</p>}
+                {showPrice && <p className="font-bold text-purple">₱{product.price.toFixed(2)}</p>}
             </div>
         </Link>
     );

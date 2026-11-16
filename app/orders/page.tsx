@@ -55,7 +55,7 @@ export default async function OrdersPage({
                                     <span className="text-xs font-bold uppercase">{f.Status}</span>
                                 </div>
                                 <p className="text-sm">{f.Items}</p>
-                                <p className="font-black text-purple">${(f.Total ?? 0).toFixed(2)}</p>
+                                <p className="font-black text-purple">₱{(f.Total ?? 0).toFixed(2)}</p>
                             </li>
                         );
                     })}

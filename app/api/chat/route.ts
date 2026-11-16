@@ -13,7 +13,7 @@ export async function POST(req: Request) {
         productContext = products
             .map(
                 (p) =>
-                    `- ${p.name} ($${p.price.toFixed(2)}), sizes: ${p.sizes.join(", ")}`
+                    `- ${p.name} (₱${p.price.toFixed(2)}), sizes: ${p.sizes.join(", ")}`
             )
             .join("\n");
     } catch {

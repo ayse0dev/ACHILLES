@@ -36,7 +36,7 @@ export default function CartPage() {
                             <Link href={`/shop/${item.slug}`} className="font-display font-bold text-lg hover:text-purple">
                                 {item.name}
                             </Link>
-                            <p className="text-sm text-ink/60">Size {item.size} · ${item.price.toFixed(2)}</p>
+                            <p className="text-sm text-ink/60">Size {item.size} · ₱{item.price.toFixed(2)}</p>
                             <button
                                 onClick={() => remove(item.slug, item.size)}
                                 className="text-xs underline text-ink/60 hover:text-red mt-1"
@@ -68,7 +68,7 @@ export default function CartPage() {
             <div className="card p-6 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
                 <div>
                     <p className="text-sm text-ink/60">Subtotal</p>
-                    <p className="text-3xl font-black text-purple">${subtotal.toFixed(2)}</p>
+                    <p className="text-3xl font-black text-purple">₱{subtotal.toFixed(2)}</p>
                 </div>
                 <div className="flex gap-3 items-center">
                     <button onClick={clear} className="btn btn-ghost text-sm">Clear cart</button>

@@ -44,7 +44,7 @@ export default async function ProductPage({
                         {product.category && <p className="text-sm text-ink/60">{product.category}</p>}
                     </div>
 
-                    <p className="text-2xl font-bold">${product.price.toFixed(2)}</p>
+                    <p className="text-2xl font-bold">₱{product.price.toFixed(2)}</p>
 
                     {product.stock > 0 && product.stock <= 3 && (
                         <p className="text-sm font-bold text-orange uppercase tracking-wide">

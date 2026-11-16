@@ -44,7 +44,7 @@ export async function updateRepair(_prev: AdminState, formData: FormData): Promi
 
     if (fields.Email && (statusChanged || quoteChanged)) {
         const lines = [`Hi ${fields.Name ?? "there"},`, "", `Your repair for ${fields.ShoeDescription ?? "your shoe"} is now: ${parsed.data.status}.`];
-        if (quoteNumber !== undefined) lines.push(`Quote: $${quoteNumber.toFixed(2)}`);
+        if (quoteNumber !== undefined) lines.push(`Quote: ₱${quoteNumber.toFixed(2)}`);
         lines.push("", "Check the Track page any time for updates.");
         await sendEmail(fields.Email, "Your ACHILLES repair update", lines.join("\n"));
     }

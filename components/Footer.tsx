@@ -1,30 +1,36 @@
 import Link from "next/link";
+import { contact } from "@/lib/business";
 
 const columns = [
     {
         title: "Shop",
         links: [
             { href: "/shop", label: "All shoes" },
-            { href: "/cart", label: "Your bag" },
-            { href: "/orders", label: "Your orders" },
-            { href: "/wishlist", label: "Wishlist" },
+            { href: "/shop?category=Men", label: "Men" },
+            { href: "/shop?category=Women", label: "Women" },
+            { href: "/shop?category=Kids", label: "Kids" },
+            { href: "/shop?category=Sports", label: "Sports" },
+            { href: "/sales", label: "Sales & Offers" },
         ],
     },
     {
-        title: "Repair",
+        title: "Repairs",
         links: [
-            { href: "/repair", label: "Request a repair" },
+            { href: "/repair", label: "Repair services" },
             { href: "/book", label: "Book a drop-off" },
             { href: "/track", label: "Track a repair" },
             { href: "/reviews", label: "Reviews" },
+            { href: "/care", label: "Care guide" },
         ],
     },
     {
         title: "Help",
         links: [
+            { href: "/contact", label: "Contact" },
+            { href: "/policies#repair", label: "Repair policies & warranty" },
+            { href: "/policies#shopping", label: "Shipping & returns" },
             { href: "/sizing", label: "Sizing guide" },
-            { href: "/care", label: "Care guide" },
-            { href: "/about", label: "About ACHILLES" },
+            { href: "/about", label: "About" },
             { href: "/download", label: "Get the app" },
         ],
     },
@@ -35,12 +41,10 @@ export default function Footer() {
         <footer className="bg-ink text-white mt-24">
             <div className="max-w-7xl mx-auto px-4 md:px-6 py-16 grid gap-12 md:grid-cols-4">
                 <div className="space-y-4">
-                    <p className="font-black text-3xl tracking-tight uppercase">
-                        <img src="/logo.png" alt="ACHILLES" className="h-20 w-auto" />
-                    </p>
-                    <p className="text-sm text-white/70 max-w-xs">
-                        Shoes you love, and repairs that bring them back.
-                    </p>
+                    <img src="/logo.png" alt="ACHILLES" className="h-24 w-auto" />
+                    <p className="text-sm text-white/70 max-w-xs">Repair. Restore. Retail.</p>
+                    <p className="text-xs text-white/60">{contact.address}</p>
+                    <p className="text-xs text-white/60">{contact.hours}</p>
                 </div>
                 {columns.map((c) => (
                     <div key={c.title}>
@@ -59,7 +63,7 @@ export default function Footer() {
             </div>
             <div className="border-t border-white/15">
                 <p className="max-w-7xl mx-auto px-4 md:px-6 py-6 text-xs text-white/60">
-                    © {new Date().getFullYear()} ACHILLES. All rights reserved.
+                    © ACHILLES {new Date().getFullYear()}. All rights reserved.
                 </p>
             </div>
         </footer>

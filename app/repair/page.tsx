@@ -4,17 +4,9 @@ import Link from "next/link";
 import { useActionState } from "react";
 import { submitRepair, RepairState } from "./actions";
 import BeforeAfter from "@/components/BeforeAfter";
+import { repairGroups, rushNotes, mailInSteps, repairPolicies } from "@/lib/business";
 
 const initial: RepairState = {};
-
-const services = [
-    { name: "Sole replacement", note: "Worn-out soles rebuilt or swapped" },
-    { name: "Heel repair", note: "Re-build and re-glue worn heels" },
-    { name: "Stitching & seams", note: "Loose threads, split seams, torn linings" },
-    { name: "Zipper & buckle", note: "Replace zippers, straps and buckles" },
-    { name: "Cleaning & restoration", note: "Deep clean, whitening and polish" },
-    { name: "Stretching", note: "Make a tight pair comfortable again" },
-];
 
 const transformations = [
     { label: "Derby", before: "/before-after/derby-before.jpg", after: "/before-after/derby-after.jpg" },
@@ -27,34 +19,82 @@ export default function RepairPage() {
     const [state, formAction, isPending] = useActionState(submitRepair, initial);
 
     return (
-        <div className="max-w-5xl mx-auto px-4 py-10 space-y-14">
+        <div className="max-w-5xl mx-auto px-4 py-10 space-y-16">
             <section className="space-y-6">
                 <div>
-                    <p className="eyebrow mb-2">The transformation</p>
+                    <p className="eyebrow mb-2">Repairs</p>
                     <h1 className="page-title">Worn out. Brought back.</h1>
+                    <p className="text-ink/75 mt-3 max-w-2xl">
+                        From worn heels to full restorations, ACHILLES brings your footwear back to life. Free estimate on drop-off. Mail-in accepted nationwide.
+                    </p>
                 </div>
                 <BeforeAfter pairs={transformations} />
-            </section>
-
-            <section>
-                <p className="eyebrow mb-2">Repair services</p>
-                <h2 className="page-title mb-6 !text-3xl">Give your shoes a second life</h2>
-                <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
-                    {services.map((s, i) => (
-                        <div
-                            key={s.name}
-                            className="card p-5 border-t-4"
-                            style={{ borderColor: ["#19b3c4", "#8b3fc7", "#ff7a3d", "#ffc83d", "#e8374f", "#19b3c4"][i] }}
-                        >
-                            <h3 className="font-display font-bold text-xl">{s.name}</h3>
-                            <p className="text-sm text-ink/70 mt-1">{s.note}</p>
-                            <p className="text-xs mt-3 font-bold text-purple">Quote after inspection</p>
-                        </div>
-                    ))}
+                <div className="flex flex-wrap gap-3">
+                    <a href="#request" className="btn btn-accent uppercase text-sm tracking-wide">Request a repair quote</a>
+                    <Link href="/book" className="btn btn-ghost uppercase text-sm tracking-wide">Book a drop-off</Link>
                 </div>
             </section>
 
-            <section className="max-w-md mx-auto w-full">
+            <section className="space-y-8">
+                <div>
+                    <p className="eyebrow mb-2">Price list</p>
+                    <h2 className="page-title !text-3xl">Services and turnaround</h2>
+                </div>
+                {repairGroups.map((group) => (
+                    <div key={group.title} className="card overflow-x-auto">
+                        <h3 className="font-black uppercase tracking-tight text-lg px-5 pt-5">{group.title}</h3>
+                        <table className="w-full text-left text-sm mt-3">
+                            <thead className="bg-ink text-white">
+                                <tr>
+                                    <th className="px-5 py-3">Service</th>
+                                    <th className="px-5 py-3">Price</th>
+                                    <th className="px-5 py-3">Turnaround</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {group.rows.map((row, i) => (
+                                    <tr key={row.service} className={i % 2 ? "bg-purple/5" : ""}>
+                                        <td className="px-5 py-3 font-bold">{row.service}</td>
+                                        <td className="px-5 py-3 text-purple font-bold whitespace-nowrap">{row.price}</td>
+                                        <td className="px-5 py-3 text-ink/70">{row.turnaround}</td>
+                                    </tr>
+                                ))}
+                            </tbody>
+                        </table>
+                    </div>
+                ))}
+            </section>
+
+            <section className="grid md:grid-cols-2 gap-6">
+                <div className="card p-6 border-t-4 border-orange space-y-3">
+                    <h2 className="font-black uppercase text-xl">Rush service</h2>
+                    <ul className="space-y-2 text-sm text-ink/80 list-disc pl-5">
+                        {rushNotes.map((n) => (
+                            <li key={n}>{n}</li>
+                        ))}
+                    </ul>
+                </div>
+                <div className="card p-6 border-t-4 border-teal space-y-3">
+                    <h2 className="font-black uppercase text-xl">Mail-in repair</h2>
+                    <ol className="space-y-2 text-sm text-ink/80 list-decimal pl-5">
+                        {mailInSteps.map((s) => (
+                            <li key={s}>{s}</li>
+                        ))}
+                    </ol>
+                    <p className="text-xs text-ink/60">Adds about 2–4 days each way.</p>
+                </div>
+            </section>
+
+            <section className="card p-6 md:p-8 space-y-3">
+                <h2 className="font-black uppercase text-xl">Repair policies</h2>
+                <ul className="space-y-2 text-sm text-ink/80 list-disc pl-5">
+                    {repairPolicies.map((p) => (
+                        <li key={p}>{p}</li>
+                    ))}
+                </ul>
+            </section>
+
+            <section id="request" className="max-w-md mx-auto w-full scroll-mt-28">
                 {state.success ? (
                     <div className="card p-8 text-center space-y-4">
                         <p className="eyebrow">All set</p>
@@ -66,7 +106,7 @@ export default function RepairPage() {
                     <div className="card p-6 md:p-8 space-y-5">
                         <div>
                             <p className="eyebrow mb-1">Start here</p>
-                            <h2 className="page-title !text-3xl">Request a repair</h2>
+                            <h2 className="page-title !text-3xl">Request a repair quote</h2>
                         </div>
                         <form action={formAction} className="space-y-3">
                             <input name="name" placeholder="Your name" required className="field" />

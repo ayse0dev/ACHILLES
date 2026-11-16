@@ -4,6 +4,7 @@ import { base } from "@/lib/airtable";
 import ProductCard from "@/components/ProductCard";
 import HomeTabs from "@/components/HomeTabs";
 import { DoodleField } from "@/components/Doodles";
+import { contact, trustPoints, shopCategories } from "@/lib/business";
 
 export const dynamic = "force-dynamic";
 
@@ -69,32 +70,32 @@ export default async function HomePage() {
                 <div className="space-y-7">
                     <p className="eyebrow">Footwear &amp; repair</p>
                     <h1 className="uppercase font-black tracking-tight text-5xl md:text-6xl leading-[0.95] text-ink">
-                        Shoes you love.<br />
-                        <span className="text-purple">Repairs that last.</span>
+                        Repair. Restore.<br />
+                        <span className="text-purple">Retail.</span>
                     </h1>
                     <p className="text-lg text-ink/75 max-w-lg">
-                        Shop the collection, book a drop-off, or track your repair, all in one place.
+                        Quality shoe repair and footwear for the whole family: men, women, and kids.
                     </p>
                     <div className="flex flex-wrap gap-4">
-                        <Link href="/register" className="btn btn-ink !px-7 !py-4 uppercase text-sm tracking-wide">
-                            Join ACHILLES
+                        <Link href="/book" className="btn btn-ink !px-7 !py-4 uppercase text-sm tracking-wide">
+                            Book a repair
                         </Link>
-                        <Link href="/repair" className="btn btn-ghost !px-7 !py-4 uppercase text-sm tracking-wide">
-                            Request a repair
+                        <Link href="/shop" className="btn btn-ghost !px-7 !py-4 uppercase text-sm tracking-wide">
+                            Shop shoes
                         </Link>
                     </div>
-                    <div className="grid grid-cols-3 gap-4 pt-6 border-t border-ink/10 text-sm">
+                    <div className="grid sm:grid-cols-3 gap-4 pt-6 border-t border-ink/10 text-sm">
                         <div>
-                            <p className="font-black text-2xl">24h</p>
-                            <p className="text-ink/60">Repair quotes</p>
+                            <p className="font-black uppercase text-xs text-ink/60">Shop</p>
+                            <p>{contact.address}</p>
                         </div>
                         <div>
-                            <p className="font-black text-2xl">Online</p>
-                            <p className="text-ink/60">Track every repair</p>
+                            <p className="font-black uppercase text-xs text-ink/60">Hours</p>
+                            <p>{contact.hours}</p>
                         </div>
                         <div>
-                            <p className="font-black text-2xl">Secure</p>
-                            <p className="text-ink/60">Checkout by Stripe</p>
+                            <p className="font-black uppercase text-xs text-ink/60">Shipping</p>
+                            <p>Nationwide shipping</p>
                         </div>
                     </div>
                 </div>
@@ -112,10 +113,38 @@ export default async function HomePage() {
             </section>
 
             <section className="border-y border-ink/10 bg-white">
-                <div className="max-w-7xl mx-auto px-4 md:px-6 py-10 grid md:grid-cols-3 gap-6 text-center md:text-left">
-                    <p className="font-bold">Shop the collection with size and category filters.</p>
-                    <p className="font-bold">Every repair request gets an email update.</p>
-                    <p className="font-bold">Leave a review once your shoes are back on your feet.</p>
+                <div className="max-w-7xl mx-auto px-4 md:px-6 py-10 grid sm:grid-cols-2 lg:grid-cols-4 gap-6">
+                    {trustPoints.map((t) => (
+                        <div key={t.title}>
+                            <p className="font-black uppercase text-sm">{t.title}</p>
+                            <p className="text-sm text-ink/70">{t.text}</p>
+                        </div>
+                    ))}
+                </div>
+            </section>
+
+            <section className="max-w-7xl mx-auto px-4 md:px-6 pt-16">
+                <h2 className="uppercase font-black text-2xl tracking-tight mb-6">Shop by category</h2>
+                <div className="grid grid-cols-2 lg:grid-cols-5 gap-4">
+                    {shopCategories.map((c, i) => (
+                        <Link
+                            key={c.label}
+                            href={c.href}
+                            className="group relative aspect-[4/5] rounded-3xl overflow-hidden flex flex-col justify-end p-5 text-white"
+                            style={{
+                                background: [
+                                    "linear-gradient(160deg,#19b3c4,#1b1340)",
+                                    "linear-gradient(160deg,#8b3fc7,#1b1340)",
+                                    "linear-gradient(160deg,#ff7a3d,#8b3fc7)",
+                                    "linear-gradient(160deg,#ffc83d,#e8374f)",
+                                    "linear-gradient(160deg,#e8374f,#1b1340)",
+                                ][i % 5],
+                            }}
+                        >
+                            <span className="uppercase font-black text-xl tracking-tight group-hover:underline">{c.label}</span>
+                            <span className="text-xs text-white/85">{c.text}</span>
+                        </Link>
+                    ))}
                 </div>
             </section>
 

@@ -43,7 +43,7 @@ export async function POST(request: Request) {
         lineItems.push({
             quantity: item.qty,
             price_data: {
-                currency: "usd",
+                currency: "php",
                 unit_amount: Math.round(product.price * 100),
                 product_data: { name: `${product.name} (size ${item.size})` },
             },

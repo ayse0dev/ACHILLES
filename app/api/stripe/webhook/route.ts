@@ -40,7 +40,7 @@ export async function POST(request: Request) {
         await sendEmail(
             email,
             "Your ACHILLES order is confirmed",
-            `Thanks for your order!\n\nItems: ${items}\nTotal: $${total.toFixed(2)}\n\nYou can see your orders at any time on the Orders page.`
+            `Thanks for your order!\n\nItems: ${items}\nTotal: ₱${total.toFixed(2)}\n\nYou can see your orders at any time on the Orders page.`
         );
     }
 

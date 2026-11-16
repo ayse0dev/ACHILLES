@@ -31,7 +31,7 @@ export default function AdminOrderRow({
             <div className="space-y-1">
                 <p className="text-sm font-bold">{email}</p>
                 <p className="text-sm">{items}</p>
-                <p className="text-xs text-ink/60">{created} · ${total.toFixed(2)}</p>
+                <p className="text-xs text-ink/60">{created} · ₱{total.toFixed(2)}</p>
             </div>
             <div className="space-y-2">
                 <select name="status" defaultValue={status} className="field !py-2">
