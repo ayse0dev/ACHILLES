@@ -27,8 +27,10 @@ const columns = [
         title: "Help",
         links: [
             { href: "/contact", label: "Contact" },
+            { href: "/support", label: "Support" },
             { href: "/policies#repair", label: "Repair policies & warranty" },
             { href: "/policies#shopping", label: "Shipping & returns" },
+            { href: "/privacy", label: "Privacy policy" },
             { href: "/sizing", label: "Sizing guide" },
             { href: "/about", label: "About" },
             { href: "/download", label: "Get the app" },

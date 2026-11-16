@@ -17,6 +17,7 @@ export const shopCategories = [
     { label: "Women", href: "/shop?category=Women", text: "Heels, flats, sandals, boots, sneakers" },
     { label: "Kids", href: "/shop?category=Kids", text: "School shoes, sneakers, sandals, sports" },
     { label: "Sports", href: "/shop?category=Sports", text: "Running, basketball, football, training" },
+    { label: "Cleaning Equipment", href: "/shop?category=Cleaning", text: "Brushes, cleaners, polish and restoration tools" },
     { label: "Sales & Offers", href: "/sales", text: "Clearance, bundles and discounts" },
 ];
 

@@ -1,5 +1,6 @@
 "use client";
 
+import Honeypot from "@/components/Honeypot";
 import Link from "next/link";
 import { useActionState } from "react";
 import { submitRepair, RepairState } from "./actions";
@@ -100,6 +101,10 @@ export default function RepairPage() {
                         <p className="eyebrow">All set</p>
                         <h2 className="page-title !text-3xl">Request received!</h2>
                         <p className="text-ink/70">We&apos;ll email you within 24 hours with a quote.</p>
+                        {state.reference && (
+                            <p className="font-black text-2xl tracking-widest">{state.reference}</p>
+                        )}
+                        <p className="text-xs text-ink/60">Keep this reference number to track your repair.</p>
                         <Link href="/track" className="btn btn-ghost">Track your repair</Link>
                     </div>
                 ) : (
@@ -109,6 +114,7 @@ export default function RepairPage() {
                             <h2 className="page-title !text-3xl">Request a repair quote</h2>
                         </div>
                         <form action={formAction} className="space-y-3">
+<Honeypot />
                             <input name="name" placeholder="Your name" required className="field" />
                             <input name="email" type="email" placeholder="Email" required className="field" />
                             <input name="phone" placeholder="Phone (optional)" className="field" />
@@ -116,7 +122,11 @@ export default function RepairPage() {
                             <textarea name="issue" placeholder="Describe the damage" required rows={4} className="field" />
                             <input name="photoUrl" type="url" placeholder="Photo URL (optional)" className="field" />
                             {state.error && <p className="text-red text-sm">{state.error}</p>}
-                            <button disabled={isPending} className="btn btn-accent w-full">
+                            <label className="flex items-start gap-2 text-xs text-ink/70">
+<input type="checkbox" name="consent" required className="mt-0.5" />
+<span>I agree to the <a href="/privacy" target="_blank" className="underline">Privacy Policy</a> and consent to ACHILLES processing my details.</span>
+</label>
+<button disabled={isPending} className="btn btn-accent w-full">
                                 {isPending ? "Submitting..." : "Submit request"}
                             </button>
                         </form>

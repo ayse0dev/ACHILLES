@@ -6,6 +6,7 @@ import ChatWidget from "@/components/ChatWidget";
 import Footer from "@/components/Footer";
 import ScrollMotion from "@/components/ScrollMotion";
 import BackgroundArt from "@/components/BackgroundArt";
+import HideOnDashboard from "@/components/HideOnDashboard";
 
 export const metadata = {
     title: "ACHILLES — Shop & Repair Shoes",
@@ -23,12 +24,12 @@ export default function RootLayout({
             <body>
                 <BackgroundArt />
                 <Providers>
-                    <AnnouncementBar />
+                    <HideOnDashboard><AnnouncementBar /></HideOnDashboard>
                     <Navbar />
                     <ScrollMotion />
                     <main className="min-h-screen">{children}</main>
-                    <ChatWidget />
-                    <Footer />
+                    <HideOnDashboard><ChatWidget /></HideOnDashboard>
+                    <HideOnDashboard><Footer /></HideOnDashboard>
                 </Providers>
             </body>
         </html>

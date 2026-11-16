@@ -1,3 +1,4 @@
+import { hit, ipFrom } from "@/lib/rateLimit";
 import { NextResponse } from "next/server";
 import { z } from "zod";
 import { getCurrentUser } from "@/lib/session";
@@ -18,6 +19,9 @@ const schema = z.object({
 });
 
 export async function POST(request: Request) {
+    if (!hit(`checkout:${ipFrom(request.headers)}`, 10, 60000)) {
+        return NextResponse.json({ error: "Too many requests." }, { status: 429 });
+    }
     const user = await getCurrentUser();
     if (!user) {
         return NextResponse.json({ error: "Log in to checkout." }, { status: 401 });

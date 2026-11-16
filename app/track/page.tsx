@@ -2,56 +2,65 @@
 
 import Link from "next/link";
 import { useActionState } from "react";
-import { lookupRepairs, TrackState } from "./actions";
+import ProgressLine from "@/components/ProgressLine";
+import { lookupReference, TrackState } from "./actions";
 
 const initial: TrackState = {};
 
-const statusStyle: Record<string, string> = {
-    Pending: "bg-yellow/30 text-ink",
-    "In progress": "bg-teal/25 text-ink",
-    Ready: "bg-purple/20 text-ink",
-    Completed: "bg-orange/25 text-ink",
-};
-
 export default function TrackPage() {
-    const [state, formAction, isPending] = useActionState(lookupRepairs, initial);
+    const [state, formAction, isPending] = useActionState(lookupReference, initial);
+    const r = state.result;
 
     return (
-        <div className="max-w-md mx-auto px-4 py-10 space-y-6">
+        <div className="max-w-xl mx-auto px-4 py-10 space-y-6">
             <div>
-                <p className="eyebrow mb-2">Repair tracker</p>
-                <h1 className="page-title">Where is my shoe?</h1>
-                <p className="text-ink/70 mt-2">Enter the email you used when you requested the repair.</p>
+                <p className="eyebrow mb-2">Tracker</p>
+                <h1 className="page-title">Where is my order?</h1>
+                <p className="text-ink/70 mt-2">
+                    Enter the reference number from your confirmation email. Repairs start with RP and shop orders with OR.
+                </p>
             </div>
 
             <form action={formAction} className="card p-6 space-y-3">
-                <input name="email" type="email" placeholder="Email" required className="field" />
+                <input
+                    name="reference"
+                    placeholder="RP-4K7M2X"
+                    required
+                    autoCapitalize="characters"
+                    className="field uppercase tracking-widest"
+                />
                 {state.error && <p className="text-red text-sm">{state.error}</p>}
                 <button disabled={isPending} className="btn btn-accent w-full">
-                    {isPending ? "Searching..." : "Check status"}
+                    {isPending ? "Searching..." : "Track"}
                 </button>
             </form>
 
-            {state.searched && state.results?.length === 0 && (
+            {state.searched && !r && (
                 <p className="text-center text-ink/70">
-                    No repairs found for that email yet. <Link href="/repair" className="underline">Request one</Link>.
+                    We couldn&apos;t find that reference. <Link href="/contact" className="underline">Contact support</Link>.
                 </p>
             )}
 
-            {state.results && state.results.length > 0 && (
-                <ul className="space-y-3">
-                    {state.results.map((r, i) => (
-                        <li key={i} className="card p-5 flex items-center justify-between gap-4">
-                            <div>
-                                <p className="font-display font-bold text-lg">{r.shoe}</p>
-                                <p className="text-xs text-ink/60">Submitted {r.submitted}</p>
-                            </div>
-                            <span className={`text-xs font-bold px-3 py-1 rounded-full ${statusStyle[r.status] ?? "bg-ink/10"}`}>
-                                {r.status}
-                            </span>
-                        </li>
-                    ))}
-                </ul>
+            {r && (
+                <div className="card p-6 space-y-6">
+                    <div className="flex items-start justify-between gap-4">
+                        <div>
+                            <p className="eyebrow">{r.kind}</p>
+                            <p className="font-display font-bold text-xl">{r.title}</p>
+                            <p className="text-xs text-ink/60">
+                                {r.reference} · {r.submitted}
+                            </p>
+                        </div>
+                        <span className="text-xs font-bold px-3 py-1 rounded-full bg-teal/25">{r.status}</span>
+                    </div>
+                    <ProgressLine steps={r.steps} current={r.status} />
+                    {r.note && <p className="text-sm font-bold">{r.note}</p>}
+                    {r.kind !== "Ticket" && ["Completed", "Delivered"].includes(r.status) && (
+                        <Link href={`/reviews?ref=${r.reference}`} className="btn btn-accent">
+                            Review this {r.kind.toLowerCase()}
+                        </Link>
+                    )}
+                </div>
             )}
         </div>
     );

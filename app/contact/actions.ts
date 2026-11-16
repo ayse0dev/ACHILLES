@@ -3,6 +3,7 @@
 import { z } from "zod";
 import { base } from "@/lib/airtable";
 import { sendEmail } from "@/lib/mail";
+import { allow, TOO_MANY } from "@/lib/rateLimit";
 
 const schema = z.object({
     name: z.string().min(1),
@@ -17,6 +18,8 @@ const schema = z.object({
 export type ContactState = { error?: string; success?: boolean };
 
 export async function sendContactMessage(_prev: ContactState, formData: FormData): Promise<ContactState> {
+    if (formData.get("website")) return { success: true } as never;
+    if (!(await allow("contact", 5, 3600))) return { error: TOO_MANY };
     const parsed = schema.safeParse({
         name: formData.get("name"),
         phone: formData.get("phone") || undefined,

@@ -4,6 +4,7 @@ import bcrypt from "bcryptjs";
 import { z } from "zod";
 import { base } from "@/lib/airtable";
 import { findUserByEmail } from "@/lib/users";
+import { allow, TOO_MANY } from "@/lib/rateLimit";
 
 const schema = z.object({
     name: z.string().min(2),
@@ -17,6 +18,9 @@ export async function registerUser(
     _prev: RegisterState,
     formData: FormData
 ): Promise<RegisterState> {
+    if (formData.get("website")) return { success: true } as never;
+    if (!(await allow("register", 5, 3600))) return { error: TOO_MANY };
+    if (!formData.get("consent")) return { error: "Please agree to the Privacy Policy to continue." };
     const parsed = schema.safeParse({
         name: formData.get("name"),
         email: formData.get("email"),

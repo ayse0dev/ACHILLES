@@ -4,6 +4,8 @@ import bcrypt from "bcryptjs";
 import { z } from "zod";
 import { findUserByEmail } from "@/lib/users";
 import { generateOTP, sendOtpEmail } from "@/lib/otp";
+import { allow, hit, TOO_MANY } from "@/lib/rateLimit";
+import { audit } from "@/lib/audit";
 
 const schema = z.object({
     email: z.string().email(),
@@ -24,6 +26,9 @@ export async function requestLoginCode(
         return { error: "Enter a valid email and password." };
     }
 
+    if (!(await allow("login", 15, 900))) return { error: TOO_MANY };
+    if (!hit(`login-email:${parsed.data.email.toLowerCase()}`, 6, 900000)) return { error: TOO_MANY };
+
     const record = await findUserByEmail(parsed.data.email);
     const hash = (record?.fields as { PasswordHash?: string } | undefined)?.PasswordHash;
     if (!record || !hash) {
@@ -32,6 +37,7 @@ export async function requestLoginCode(
 
     const passwordOk = await bcrypt.compare(parsed.data.password, hash);
     if (!passwordOk) {
+        await audit(parsed.data.email, "login_failed", "password");
         return { error: "Invalid email or password." };
     }
 

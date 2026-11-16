@@ -1,5 +1,6 @@
 "use client";
 
+import Honeypot from "@/components/Honeypot";
 import { useActionState } from "react";
 import { useRouter } from "next/navigation";
 import { signIn } from "next-auth/react";
@@ -26,6 +27,7 @@ export default function RegisterPage() {
                     <h1 className="page-title !text-3xl">Create account</h1>
                 </div>
                 <form action={formAction} className="space-y-3">
+<Honeypot />
                     <input name="name" placeholder="Full name" required className="field" />
                     <input name="email" type="email" placeholder="Email" required className="field" />
                     <input
@@ -36,7 +38,11 @@ export default function RegisterPage() {
                         className="field"
                     />
                     {state.error && <p className="text-red text-sm">{state.error}</p>}
-                    <button disabled={isPending} className="btn btn-accent w-full">
+                    <label className="flex items-start gap-2 text-xs text-ink/70">
+<input type="checkbox" name="consent" required className="mt-0.5" />
+<span>I agree to the <a href="/privacy" target="_blank" className="underline">Privacy Policy</a> and consent to ACHILLES processing my details.</span>
+</label>
+<button disabled={isPending} className="btn btn-accent w-full">
                         {isPending ? "Creating..." : "Register"}
                     </button>
                 </form>

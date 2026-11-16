@@ -4,7 +4,8 @@ import ReviewForm from "@/components/ReviewForm";
 
 export const dynamic = "force-dynamic";
 
-export default async function ReviewsPage() {
+export default async function ReviewsPage({ searchParams }: { searchParams: Promise<{ ref?: string }> }) {
+    const { ref } = await searchParams;
     const user = await getCurrentUser();
     const records = await base("Reviews")
         .select({
@@ -54,7 +55,7 @@ export default async function ReviewsPage() {
                 </div>
 
                 <div className="card p-6 md:p-8 h-fit">
-                    <ReviewForm loggedIn={!!user} />
+                    <ReviewForm loggedIn={!!user} reference={ref} />
                 </div>
             </div>
         </div>

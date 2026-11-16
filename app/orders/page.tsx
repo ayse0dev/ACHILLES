@@ -1,4 +1,6 @@
 import Link from "next/link";
+import ProgressLine from "@/components/ProgressLine";
+import { orderSteps } from "@/lib/reference";
 import { base } from "@/lib/airtable";
 import { formulaString } from "@/lib/formula";
 import { getCurrentUser } from "@/lib/session";
@@ -45,7 +47,7 @@ export default async function OrdersPage({
             ) : (
                 <ul className="space-y-4">
                     {records.map((r) => {
-                        const f = r.fields as { Items?: string; Total?: number; Status?: string; CreatedAt?: string };
+                        const f = r.fields as { Reference?: string; Items?: string; Total?: number; Status?: string; CreatedAt?: string };
                         return (
                             <li key={r.id} className="card p-5 space-y-2">
                                 <div className="flex justify-between gap-4">
@@ -54,7 +56,12 @@ export default async function OrdersPage({
                                     </p>
                                     <span className="text-xs font-bold uppercase">{f.Status}</span>
                                 </div>
+                                {f.Reference && <p className="text-xs font-bold tracking-widest">{f.Reference}</p>}
                                 <p className="text-sm">{f.Items}</p>
+                                <ProgressLine steps={orderSteps} current={f.Status ?? "Paid"} />
+                                {f.Status === "Delivered" && f.Reference && (
+                                    <Link href={`/reviews?ref=${f.Reference}`} className="underline font-bold text-sm">Review this order</Link>
+                                )}
                                 <p className="font-black text-purple">₱{(f.Total ?? 0).toFixed(2)}</p>
                             </li>
                         );

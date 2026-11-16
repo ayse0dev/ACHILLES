@@ -1,3 +1,4 @@
+import { hit, ipFrom } from "@/lib/rateLimit";
 import { google } from "@ai-sdk/google";
 import { streamText } from "ai";
 import { getFeaturedProducts } from "@/lib/products";
@@ -5,6 +6,9 @@ import { getFeaturedProducts } from "@/lib/products";
 export const maxDuration = 30;
 
 export async function POST(req: Request) {
+    if (!hit(`chat:${ipFrom(req.headers)}`, 20, 60000)) {
+        return new Response("Too many requests", { status: 429 });
+    }
     const { messages } = await req.json();
 
     let productContext = "";

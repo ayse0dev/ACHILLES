@@ -3,6 +3,8 @@ import type Stripe from "stripe";
 import { base } from "@/lib/airtable";
 import { getStripe } from "@/lib/stripe";
 import { sendEmail } from "@/lib/mail";
+import { notify } from "@/lib/notify";
+import { newReference } from "@/lib/reference";
 
 export async function POST(request: Request) {
     const secret = process.env.STRIPE_WEBHOOK_SECRET;
@@ -28,7 +30,10 @@ export async function POST(request: Request) {
         const total = (session.amount_total ?? 0) / 100;
         const email = session.customer_email ?? "";
 
+        const reference = newReference("OR");
+
         await base("Orders").create({
+            Reference: reference,
             Email: email,
             Items: items,
             Total: total,
@@ -42,6 +47,7 @@ export async function POST(request: Request) {
             "Your ACHILLES order is confirmed",
             `Thanks for your order!\n\nItems: ${items}\nTotal: ₱${total.toFixed(2)}\n\nYou can see your orders at any time on the Orders page.`
         );
+        await notify(email, "Order confirmed", `Reference ${reference}. Total ₱${total.toFixed(2)}.`, "/orders");
     }
 
     return NextResponse.json({ received: true });

@@ -1,5 +1,6 @@
 "use client";
 
+import Honeypot from "@/components/Honeypot";
 import { useActionState } from "react";
 import { sendContactMessage, ContactState } from "./actions";
 import { contact } from "@/lib/business";
@@ -47,6 +48,7 @@ export default function ContactPage() {
                     </div>
                 ) : (
                     <form action={formAction} className="space-y-3">
+<Honeypot />
                         <h2 className="font-black uppercase text-xl">Send a message</h2>
                         <input name="name" placeholder="Name" required className="field" />
                         <input name="phone" placeholder="Contact number (optional)" className="field" />

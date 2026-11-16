@@ -6,7 +6,7 @@ import { submitReview, ReviewState } from "@/app/reviews/actions";
 
 const initial: ReviewState = {};
 
-export default function ReviewForm({ loggedIn }: { loggedIn: boolean }) {
+export default function ReviewForm({ loggedIn, reference }: { loggedIn: boolean; reference?: string }) {
     const [state, formAction, isPending] = useActionState(submitReview, initial);
 
     if (state.success) {
@@ -26,6 +26,12 @@ export default function ReviewForm({ loggedIn }: { loggedIn: boolean }) {
     return (
         <form action={formAction} className="space-y-3">
             <p className="font-black uppercase">Leave a review</p>
+            {reference && (
+                <>
+                    <input type="hidden" name="reference" value={reference} />
+                    <p className="text-xs font-bold tracking-widest text-ink/60">For {reference}</p>
+                </>
+            )}
             <select name="rating" required defaultValue="" className="field">
                 <option value="" disabled>Choose a rating</option>
                 <option value="5">5 — Excellent</option>
