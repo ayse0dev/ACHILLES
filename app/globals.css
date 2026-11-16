@@ -232,3 +232,20 @@ body {
 @media (prefers-reduced-motion: reduce) {
   .animate-cloud, .animate-cloud-slow, .animate-wiggle { animation: none; }
 }
+
+@keyframes wave-move {
+  from { transform: translateX(0); }
+  to { transform: translateX(-50%); }
+}
+.animate-wave { animation: wave-move 26s linear infinite; }
+.animate-wave-reverse { animation: wave-move 38s linear infinite reverse; }
+
+@keyframes sway {
+  0%, 100% { transform: rotate(-3deg); }
+  50% { transform: rotate(3deg); }
+}
+.animate-sway { animation: sway 5s ease-in-out infinite; }
+
+@media (prefers-reduced-motion: reduce) {
+  .animate-wave, .animate-wave-reverse, .animate-sway { animation: none; }
+}

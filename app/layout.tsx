@@ -5,6 +5,7 @@ import AnnouncementBar from "@/components/AnnouncementBar";
 import ChatWidget from "@/components/ChatWidget";
 import Footer from "@/components/Footer";
 import ScrollMotion from "@/components/ScrollMotion";
+import BackgroundArt from "@/components/BackgroundArt";
 
 export const metadata = {
     title: "ACHILLES — Shop & Repair Shoes",
@@ -20,6 +21,7 @@ export default function RootLayout({
     return (
         <html lang="en">
             <body>
+                <BackgroundArt />
                 <Providers>
                     <AnnouncementBar />
                     <Navbar />
