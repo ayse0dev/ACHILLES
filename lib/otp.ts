@@ -1,7 +1,7 @@
-import nodemailer from "nodemailer";
 import crypto from "crypto";
 import { base } from "./airtable";
 import { findUserByEmail } from "./users";
+import { sendEmail } from "./mail";
 
 const CODE_TTL_MS = 5 * 60 * 1000;
 
@@ -31,18 +31,9 @@ export async function verifyOTP(email: string, code: string): Promise<boolean> {
 }
 
 export async function sendOtpEmail(email: string, code: string) {
-    const transporter = nodemailer.createTransport({
-        service: "gmail",
-        auth: {
-            user: process.env.GMAIL_USER,
-            pass: process.env.GMAIL_PASS,
-        },
-    });
-
-    await transporter.sendMail({
-        from: process.env.GMAIL_USER,
-        to: email,
-        subject: "Your ACHILLES login code",
-        text: `Your login verification code is ${code}. It expires in 5 minutes.`,
-    });
+    await sendEmail(
+        email,
+        "Your ACHILLES login code",
+        `Your login verification code is ${code}. It expires in 5 minutes.`
+    );
 }

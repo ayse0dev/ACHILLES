@@ -1,107 +1,192 @@
 import Link from "next/link";
 import { getFeaturedProducts } from "@/lib/products";
+import { base } from "@/lib/airtable";
 import ProductCard from "@/components/ProductCard";
+import HomeTabs from "@/components/HomeTabs";
+
+export const dynamic = "force-dynamic";
+
+const features = [
+    { href: "/shop", title: "Shoes", text: "Browse and filter the collection." },
+    { href: "/repair", title: "Repairs", text: "Soles, heels, stitching and more." },
+    { href: "/book", title: "Book a drop-off", text: "Choose a time that suits you." },
+    { href: "/track", title: "Track", text: "See your repair status by email." },
+    { href: "/wishlist", title: "Wishlist", text: "Save the pairs you want next." },
+    { href: "/reviews", title: "Reviews", text: "Read what customers say about their repairs." },
+];
+
+const tabs = [
+    {
+        key: "shoppers",
+        label: "Shoppers",
+        title: "Find the pair you'll wear every day",
+        points: ["Filter by category and sort by price", "Choose your size with the sizing guide", "Save favorites and check out securely"],
+        href: "/shop",
+        cta: "Shop now",
+    },
+    {
+        key: "repairs",
+        label: "Repairs",
+        title: "Give your favorite shoes a second life",
+        points: ["Request a repair with photos", "Get a quote within 24 hours", "Track progress without calling"],
+        href: "/repair",
+        cta: "Request a repair",
+    },
+    {
+        key: "care",
+        label: "Care",
+        title: "Keep every pair looking new",
+        points: ["Simple cleaning and storage tips", "Know when a repair is worth it", "Book a consultation with our team"],
+        href: "/care",
+        cta: "Read the care guide",
+    },
+];
 
 export default async function HomePage() {
     const products = await getFeaturedProducts(8);
-    const categories = Array.from(new Set(products.map((p) => p.category).filter(Boolean) as string[])).slice(0, 4);
+    const [hero, ...rest] = products;
+    const featured = rest.slice(0, 4);
+
+    const reviewRecords = await base("Reviews")
+        .select({ filterByFormula: "{Approved}", sort: [{ field: "CreatedAt", direction: "desc" }], maxRecords: 3 })
+        .firstPage()
+        .catch(() => []);
+    const reviews = reviewRecords.map((r) => {
+        const f = r.fields as { Name?: string; Rating?: number; Comment?: string };
+        return { id: r.id, name: f.Name ?? "Customer", rating: Math.min(5, Math.max(1, Math.round(f.Rating ?? 5))), comment: f.Comment ?? "" };
+    });
 
     return (
         <div>
-            <section className="abstract-hero relative min-h-[80vh] flex items-center justify-center px-6 py-24 text-center">
-                <span className="blob w-96 h-96 -top-24 -left-16 bg-teal" />
-                <span className="blob w-80 h-80 -bottom-28 right-0 bg-orange" />
-                <span className="blob w-52 h-52 top-12 right-1/4 bg-purple opacity-60" />
-                <span className="ring w-64 h-64 bottom-10 left-1/3" />
-
-                <div className="max-w-4xl space-y-6">
+            <section className="max-w-7xl mx-auto px-4 md:px-6 pt-14 pb-20 grid lg:grid-cols-2 gap-12 items-center">
+                <div className="space-y-7">
                     <p className="eyebrow">Footwear &amp; repair</p>
-                    <h1 className="uppercase font-black tracking-tight text-5xl md:text-8xl leading-[0.9] text-ink">
-                        New shoes.<br />
-                        <span className="text-purple">Fresh soles.</span>
+                    <h1 className="uppercase font-black tracking-tight text-5xl md:text-6xl leading-[0.95] text-ink">
+                        Shoes you love.<br />
+                        <span className="text-purple">Repairs that last.</span>
                     </h1>
-                    <p className="text-lg md:text-xl max-w-xl mx-auto text-ink/80">
-                        Find your next pair, or bring your favorites back to life.
+                    <p className="text-lg text-ink/75 max-w-lg">
+                        Shop the collection, book a drop-off, or track your repair, all in one place.
                     </p>
-                    <div className="flex flex-wrap gap-4 justify-center pt-2">
-                        <Link href="/shop" className="btn btn-ink !px-8 !py-4 uppercase text-sm tracking-wide">
-                            Shop new arrivals
+                    <div className="flex flex-wrap gap-4">
+                        <Link href="/register" className="btn btn-ink !px-7 !py-4 uppercase text-sm tracking-wide">
+                            Join ACHILLES
                         </Link>
-                        <Link href="/repair" className="btn btn-ghost !px-8 !py-4 uppercase text-sm tracking-wide">
-                            Book a repair
+                        <Link href="/repair" className="btn btn-ghost !px-7 !py-4 uppercase text-sm tracking-wide">
+                            Request a repair
                         </Link>
+                    </div>
+                    <div className="grid grid-cols-3 gap-4 pt-6 border-t border-ink/10 text-sm">
+                        <div>
+                            <p className="font-black text-2xl">24h</p>
+                            <p className="text-ink/60">Repair quotes</p>
+                        </div>
+                        <div>
+                            <p className="font-black text-2xl">Online</p>
+                            <p className="text-ink/60">Track every repair</p>
+                        </div>
+                        <div>
+                            <p className="font-black text-2xl">Secure</p>
+                            <p className="text-ink/60">Checkout by Stripe</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div className="abstract-hero relative rounded-[2rem] aspect-[4/5] md:aspect-square p-6 md:p-10 flex items-center justify-center">
+                    <span className="blob w-72 h-72 -top-10 -left-10 bg-teal" />
+                    <span className="blob w-60 h-60 -bottom-10 -right-6 bg-orange" />
+                    {hero ? (
+                        <div className="relative w-full max-w-xs">
+                            <ProductCard product={hero} />
+                        </div>
+                    ) : (
+                        <p className="relative font-black uppercase text-3xl text-ink/40">New arrivals soon</p>
+                    )}
+                </div>
+            </section>
+
+            <section className="border-y border-ink/10 bg-white">
+                <div className="max-w-7xl mx-auto px-4 md:px-6 py-10 grid md:grid-cols-3 gap-6 text-center md:text-left">
+                    <p className="font-bold">Shop the collection with size and category filters.</p>
+                    <p className="font-bold">Every repair request gets an email update.</p>
+                    <p className="font-bold">Leave a review once your shoes are back on your feet.</p>
+                </div>
+            </section>
+
+            <section className="max-w-7xl mx-auto px-4 md:px-6 py-20">
+                <p className="eyebrow mb-3">Everything in one place</p>
+                <h2 className="uppercase font-black text-3xl md:text-5xl tracking-tight mb-10">Your shoes, your way</h2>
+                <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-5">
+                    {features.map((f, i) => (
+                        <Link
+                            key={f.href}
+                            href={f.href}
+                            className="card p-7 hover:-translate-y-1 transition duration-300 border-t-4"
+                            style={{ borderColor: ["#19b3c4", "#8b3fc7", "#ff7a3d", "#ffc83d", "#e8374f", "#19b3c4"][i] }}
+                        >
+                            <h3 className="uppercase font-black text-xl mb-2">{f.title}</h3>
+                            <p className="text-ink/70">{f.text}</p>
+                        </Link>
+                    ))}
+                </div>
+            </section>
+
+            <section className="bg-ink text-white">
+                <div className="max-w-7xl mx-auto px-4 md:px-6 py-20 space-y-10">
+                    <div className="max-w-2xl space-y-3">
+                        <p className="eyebrow !text-yellow">Built for every need</p>
+                        <h2 className="uppercase font-black text-3xl md:text-5xl tracking-tight">Shopping, repairs and care</h2>
+                    </div>
+                    <div>
+                        <HomeTabs tabs={tabs} dark />
                     </div>
                 </div>
             </section>
 
-            {categories.length > 0 && (
-                <section className="max-w-7xl mx-auto px-4 md:px-6 py-16">
-                    <h2 className="uppercase font-black text-2xl tracking-tight mb-6">Shop by category</h2>
-                    <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-                        {categories.map((c, i) => (
-                            <Link
-                                key={c}
-                                href={`/shop?category=${encodeURIComponent(c)}`}
-                                className="group relative aspect-[4/5] rounded-3xl overflow-hidden flex items-end p-5 text-white"
-                                style={{
-                                    background: [
-                                        "linear-gradient(160deg,#19b3c4,#1b1340)",
-                                        "linear-gradient(160deg,#8b3fc7,#1b1340)",
-                                        "linear-gradient(160deg,#ff7a3d,#8b3fc7)",
-                                        "linear-gradient(160deg,#ffc83d,#e8374f)",
-                                    ][i % 4],
-                                }}
-                            >
-                                <span className="uppercase font-black text-xl tracking-tight group-hover:underline">{c}</span>
-                            </Link>
-                        ))}
+            <section className="max-w-7xl mx-auto px-4 md:px-6 py-20">
+                <div className="flex items-end justify-between mb-8">
+                    <div>
+                        <p className="eyebrow mb-2">Fresh picks</p>
+                        <h2 className="uppercase font-black text-3xl md:text-4xl tracking-tight">Featured shoes</h2>
                     </div>
-                </section>
-            )}
-
-            <section className="max-w-7xl mx-auto px-4 md:px-6 pb-16">
-                <div className="flex items-end justify-between mb-6">
-                    <h2 className="uppercase font-black text-2xl tracking-tight">Featured</h2>
-                    <Link href="/shop" className="text-sm font-bold uppercase underline">
-                        Shop all
-                    </Link>
+                    <Link href="/shop" className="text-sm font-bold uppercase underline">Shop all</Link>
                 </div>
-                <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
-                    {products.map((p) => (
+                <div className="grid grid-cols-2 lg:grid-cols-4 gap-x-4 gap-y-10">
+                    {featured.map((p) => (
                         <ProductCard key={p.id} product={p} />
                     ))}
                 </div>
             </section>
 
-            <section className="max-w-7xl mx-auto px-4 md:px-6 pb-16 grid md:grid-cols-2 gap-6">
-                <div className="bg-ink text-white rounded-3xl p-10 md:p-14 space-y-4">
-                    <p className="text-xs font-bold uppercase tracking-[0.2em] text-yellow">Repairs</p>
-                    <h3 className="uppercase font-black text-3xl md:text-4xl tracking-tight leading-tight">
-                        Worn soles? We rebuild them.
-                    </h3>
-                    <p className="text-white/75">Soles, heels, stitching, zippers and cleaning. Get a quote within 24 hours.</p>
-                    <Link href="/repair" className="inline-block btn btn-accent !py-3 !px-6 uppercase text-xs tracking-wide">
-                        Request a repair
-                    </Link>
-                </div>
-                <div className="bg-gradient-to-br from-teal to-purple text-white rounded-3xl p-10 md:p-14 space-y-4">
-                    <p className="text-xs font-bold uppercase tracking-[0.2em] text-yellow">Already dropped one off?</p>
-                    <h3 className="uppercase font-black text-3xl md:text-4xl tracking-tight leading-tight">
-                        Track your repair
-                    </h3>
-                    <p className="text-white/85">Check the status with the email you used when you requested it.</p>
-                    <Link href="/track" className="inline-block btn btn-ink !py-3 !px-6 uppercase text-xs tracking-wide">
-                        Check status
-                    </Link>
-                </div>
+            <section className="max-w-7xl mx-auto px-4 md:px-6 pb-20">
+                <p className="eyebrow mb-2">Reviews</p>
+                <h2 className="uppercase font-black text-3xl md:text-4xl tracking-tight mb-8">From our customers</h2>
+                {reviews.length === 0 ? (
+                    <p className="text-ink/70">
+                        Reviews will show here once they&apos;re approved. <Link href="/reviews" className="underline font-bold">Leave one</Link>.
+                    </p>
+                ) : (
+                    <div className="grid md:grid-cols-3 gap-6">
+                        {reviews.map((r) => (
+                            <article key={r.id} className="card p-7 space-y-4">
+                                <p className="text-purple font-black">
+                                    {"★".repeat(r.rating)}
+                                    {"☆".repeat(5 - r.rating)}
+                                </p>
+                                <p className="text-ink/85">{r.comment}</p>
+                                <p className="text-xs font-bold uppercase text-ink/50">{r.name}</p>
+                            </article>
+                        ))}
+                    </div>
+                )}
             </section>
 
-            <section className="max-w-7xl mx-auto px-4 md:px-6 pb-24 text-center space-y-4">
-                <h2 className="uppercase font-black text-3xl tracking-tight">Take Achilles with you</h2>
-                <p className="text-ink/70">Shop faster and track repairs on the go.</p>
-                <Link href="/download" className="btn btn-ink uppercase text-sm tracking-wide">
-                    Get the app
-                </Link>
+            <section className="max-w-7xl mx-auto px-4 md:px-6 pb-24">
+                <div className="bg-gradient-to-br from-teal via-purple to-orange text-white rounded-[2rem] p-10 md:p-16 text-center space-y-6">
+                    <h2 className="uppercase font-black text-3xl md:text-5xl tracking-tight">Take ACHILLES with you</h2>
+                    <p className="text-white/90 max-w-xl mx-auto">Shop faster and track repairs on the go.</p>
+                    <Link href="/download" className="btn btn-ink uppercase text-sm tracking-wide">Get the app</Link>
+                </div>
             </section>
         </div>
     );
