@@ -2,7 +2,10 @@
 
 import { signIn } from "next-auth/react";
 import { useRouter, useSearchParams } from "next/navigation";
-import { useState, Suspense } from "react";
+import { useActionState, useState, Suspense } from "react";
+import { requestLoginCode, RequestCodeState } from "./actions";
+
+const initialRequest: RequestCodeState = {};
 
 function safeCallback(value: string | null): string {
     if (!value || !value.startsWith("/") || value.startsWith("//")) return "/";
@@ -12,43 +15,19 @@ function safeCallback(value: string | null): string {
 function LoginForm() {
     const router = useRouter();
     const params = useSearchParams();
+    const [requestState, requestAction, requesting] = useActionState(requestLoginCode, initialRequest);
+
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
     const [otp, setOtp] = useState("");
     const [error, setError] = useState("");
-    const [info, setInfo] = useState("");
-    const [loading, setLoading] = useState(false);
-    const [sending, setSending] = useState(false);
+    const [signingIn, setSigningIn] = useState(false);
 
-    async function sendCode() {
-        setError("");
-        setInfo("");
-        if (!email) {
-            setError("Enter your email first.");
-            return;
-        }
-        setSending(true);
-        try {
-            const res = await fetch("/api/auth/otp", {
-                method: "POST",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({ email }),
-            });
-            if (!res.ok) {
-                setError("We couldn't send a code right now. Please try again.");
-                return;
-            }
-            setInfo("If an account exists for this email, a 6-digit code is on its way.");
-        } catch {
-            setError("We couldn't send a code right now. Please try again.");
-        } finally {
-            setSending(false);
-        }
-    }
+    const step: "credentials" | "code" = requestState.codeSent ? "code" : "credentials";
 
-    async function onSubmit(e: React.FormEvent) {
+    async function onVerify(e: React.FormEvent) {
         e.preventDefault();
-        setLoading(true);
+        setSigningIn(true);
         setError("");
         const res = await signIn("credentials", {
             email,
@@ -56,9 +35,9 @@ function LoginForm() {
             otp,
             redirect: false,
         });
-        setLoading(false);
+        setSigningIn(false);
         if (res?.error) {
-            setError("Invalid email, password or code.");
+            setError("That code isn't valid or has expired. Check your email or request a new one.");
             return;
         }
         router.push(safeCallback(params.get("callbackUrl")));
@@ -71,28 +50,31 @@ function LoginForm() {
                 <div>
                     <p className="eyebrow mb-1">Welcome back</p>
                     <h1 className="page-title !text-3xl">Log in</h1>
-                    <p className="text-sm text-ink/70 mt-2">
-                        Log in with your password and the 6-digit code we email you.
-                    </p>
                 </div>
-                <form onSubmit={onSubmit} className="space-y-3">
-                    <input
-                        type="email"
-                        placeholder="Email"
-                        value={email}
-                        onChange={(e) => setEmail(e.target.value)}
-                        required
-                        className="field"
-                    />
-                    <input
-                        type="password"
-                        placeholder="Password"
-                        value={password}
-                        onChange={(e) => setPassword(e.target.value)}
-                        required
-                        className="field"
-                    />
-                    <div className="flex gap-2">
+
+                {step === "credentials" && (
+                    <form
+                        action={(formData) => {
+                            setEmail(String(formData.get("email") ?? ""));
+                            setPassword(String(formData.get("password") ?? ""));
+                            requestAction(formData);
+                        }}
+                        className="space-y-3"
+                    >
+                        <input name="email" type="email" placeholder="Email" required className="field" />
+                        <input name="password" type="password" placeholder="Password" required className="field" />
+                        {requestState.error && <p className="text-red text-sm">{requestState.error}</p>}
+                        <button disabled={requesting} className="btn btn-accent w-full">
+                            {requesting ? "Checking..." : "Continue"}
+                        </button>
+                    </form>
+                )}
+
+                {step === "code" && (
+                    <form onSubmit={onVerify} className="space-y-3">
+                        <p className="text-sm text-ink/70">
+                            We emailed a 6-digit code to <span className="font-bold">{email}</span>. It expires in 5 minutes.
+                        </p>
                         <input
                             inputMode="numeric"
                             pattern="[0-9]{6}"
@@ -101,23 +83,29 @@ function LoginForm() {
                             value={otp}
                             onChange={(e) => setOtp(e.target.value.replace(/\D/g, ""))}
                             required
-                            className="field"
+                            autoFocus
+                            className="field tracking-[0.4em] text-center text-lg"
                         />
+                        {error && <p className="text-red text-sm">{error}</p>}
+                        <button disabled={signingIn || otp.length !== 6} className="btn btn-accent w-full">
+                            {signingIn ? "Logging in..." : "Log in"}
+                        </button>
                         <button
                             type="button"
-                            onClick={sendCode}
-                            disabled={sending}
-                            className="btn btn-ghost !py-2 !px-4 text-xs uppercase whitespace-nowrap"
+                            onClick={() => {
+                                const form = new FormData();
+                                form.set("email", email);
+                                form.set("password", password);
+                                requestAction(form);
+                            }}
+                            disabled={requesting}
+                            className="text-sm underline w-full text-center"
                         >
-                            {sending ? "Sending" : "Send code"}
+                            {requesting ? "Sending..." : "Send a new code"}
                         </button>
-                    </div>
-                    {info && <p className="text-sm text-purple">{info}</p>}
-                    {error && <p className="text-red text-sm">{error}</p>}
-                    <button disabled={loading} className="btn btn-accent w-full">
-                        {loading ? "Signing in..." : "Log in"}
-                    </button>
-                </form>
+                    </form>
+                )}
+
                 <p className="text-sm text-center">
                     No account?{" "}
                     <a href="/register" className="font-bold text-purple underline">
