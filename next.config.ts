@@ -12,7 +12,7 @@ const csp = [
     "frame-ancestors 'none'",
     "base-uri 'self'",
     "object-src 'none'",
-    "form-action 'self' https://checkout.stripe.com",
+    "form-action 'self'",
     ...(isDev ? [] : ["upgrade-insecure-requests"]),
 ].join("; ");
 

@@ -1,7 +1,10 @@
 "use server";
 
 import { revalidatePath } from "next/cache";
+import bcrypt from "bcryptjs";
+import { randomInt } from "crypto";
 import { z } from "zod";
+import { findUserByEmail } from "@/lib/users";
 import { base } from "@/lib/airtable";
 import { formulaString } from "@/lib/formula";
 import { sendEmail } from "@/lib/mail";
@@ -218,5 +221,42 @@ export async function updateTicket(_prev: AdminState, formData: FormData): Promi
 
     revalidatePath("/admin");
     revalidatePath("/staff");
+    return { success: true };
+}
+
+export async function createAccount(_prev: AdminState, formData: FormData): Promise<AdminState> {
+    const user = await getCurrentUser();
+    if (!user || !isAdmin(user.role)) return { error: "Only admins can create accounts." };
+
+    const parsed = z
+        .object({
+            name: z.string().trim().min(2).max(80),
+            email: z.string().trim().email(),
+            role: z.enum(["staff", "admin"]),
+        })
+        .safeParse({ name: formData.get("name"), email: formData.get("email"), role: formData.get("role") });
+    if (!parsed.success) return { error: "Enter a name, a valid email and a role." };
+
+    if (await findUserByEmail(parsed.data.email)) return { error: "An account with this email already exists." };
+
+    const alphabet = "ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnpqrstuvwxyz23456789";
+    let temp = "";
+    for (let i = 0; i < 12; i++) temp += alphabet[randomInt(alphabet.length)];
+
+    await base("Users").create({
+        Email: parsed.data.email,
+        Name: parsed.data.name,
+        PasswordHash: await bcrypt.hash(temp, 12),
+        Role: parsed.data.role,
+    });
+
+    await sendEmail(
+        parsed.data.email,
+        "Your ACHILLES staff account",
+        `Hi ${parsed.data.name},\n\nAn ACHILLES ${parsed.data.role} account was created for you.\n\nEmail: ${parsed.data.email}\nTemporary password: ${temp}\n\nLog in, then change your password under Settings. A one-time code will also be emailed to you at each login.`
+    );
+    await audit(user.email, "create_account", parsed.data.email, `role=${parsed.data.role}`);
+
+    revalidatePath("/admin");
     return { success: true };
 }

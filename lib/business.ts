@@ -2,6 +2,9 @@ export const contact = {
     address: "Quezon City, Metro Manila, Philippines",
     hours: "Mon–Sat, 9:00 AM – 6:00 PM",
     phone: "",
+    facebook: "",
+    instagram: "",
+    tiktok: "",
     shipping: "Mail-in repairs and nationwide shipping available",
 };
 

@@ -47,6 +47,12 @@ export default function Footer() {
                     <p className="text-sm text-white/70 max-w-xs">Repair. Restore. Retail.</p>
                     <p className="text-xs text-white/60">{contact.address}</p>
                     <p className="text-xs text-white/60">{contact.hours}</p>
+                    {contact.phone && <p className="text-xs text-white/60">{contact.phone}</p>}
+                    <p className="flex gap-4 text-xs font-bold">
+                        {contact.facebook && <a href={contact.facebook} target="_blank" rel="noopener noreferrer" className="underline">Facebook</a>}
+                        {contact.instagram && <a href={contact.instagram} target="_blank" rel="noopener noreferrer" className="underline">Instagram</a>}
+                        {contact.tiktok && <a href={contact.tiktok} target="_blank" rel="noopener noreferrer" className="underline">TikTok</a>}
+                    </p>
                 </div>
                 {columns.map((c) => (
                     <div key={c.title}>

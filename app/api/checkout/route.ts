@@ -3,7 +3,7 @@ import { NextResponse } from "next/server";
 import { z } from "zod";
 import { getCurrentUser } from "@/lib/session";
 import { getProductBySlug } from "@/lib/products";
-import { getStripe } from "@/lib/stripe";
+import { createCheckoutSession } from "@/lib/paymongo";
 
 const schema = z.object({
     items: z
@@ -16,6 +16,8 @@ const schema = z.object({
         )
         .min(1)
         .max(30),
+    discount: z.enum(["none", "student", "senior", "pwd"]).default("none"),
+    idNumber: z.string().trim().max(40).optional(),
 });
 
 export async function POST(request: Request) {
@@ -32,6 +34,12 @@ export async function POST(request: Request) {
         return NextResponse.json({ error: "Invalid cart." }, { status: 400 });
     }
 
+    const discount = parsed.data.discount;
+    if (discount !== "none" && !parsed.data.idNumber) {
+        return NextResponse.json({ error: "Enter your ID number to use a discount." }, { status: 400 });
+    }
+    const rate = discount === "none" ? 1 : 0.8;
+
     const lineItems = [];
     for (const item of parsed.data.items) {
         const product = await getProductBySlug(item.slug);
@@ -46,22 +54,26 @@ export async function POST(request: Request) {
         }
         lineItems.push({
             quantity: item.qty,
-            price_data: {
-                currency: "php",
-                unit_amount: Math.round(product.price * 100),
-                product_data: { name: `${product.name} (size ${item.size})` },
-            },
+            amount: Math.round(product.price * 100 * rate),
+            name: `${product.name} (size ${item.size})`,
         });
     }
 
     const origin = new URL(request.url).origin;
-    const session = await getStripe().checkout.sessions.create({
-        mode: "payment",
-        customer_email: user.email,
-        line_items: lineItems,
-        success_url: `${origin}/orders?paid=1`,
-        cancel_url: `${origin}/cart`,
-    });
 
-    return NextResponse.json({ url: session.url });
+    try {
+        const session = await createCheckoutSession({
+            lines: lineItems,
+            email: user.email,
+            successUrl: `${origin}/orders?paid=1`,
+            cancelUrl: `${origin}/cart`,
+            metadata: {
+                email: user.email,
+                ...(discount === "none" ? {} : { discount, idNumber: parsed.data.idNumber ?? "" }),
+            },
+        });
+        return NextResponse.json({ url: session.url });
+    } catch {
+        return NextResponse.json({ error: "Payment could not be started. Please try again." }, { status: 502 });
+    }
 }

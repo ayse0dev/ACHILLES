@@ -36,13 +36,13 @@ export default function Navbar() {
     const baseLinks = pathname.startsWith("/shop")
         ? [{ href: "/", label: "Home" }, ...links.filter((l) => !hiddenInShop.includes(l.href))]
         : links.filter((l) => !shopOnly.includes(l.href));
-    const isAdminUser = role === "admin";
+    const isAdminUser = role === "admin" || role === "staff";
     const visibleLinks = isAdminUser ? [] : dashboard ? [...baseLinks, dashboard] : baseLinks;
 
     return (
         <header className="sticky top-0 z-40 bg-white/90 backdrop-blur border-b border-ink/10">
             <nav className="max-w-7xl mx-auto px-4 md:px-6 h-16 flex items-center justify-between gap-4">
-                <Link href={isAdminUser ? "/admin" : "/"} className="shrink-0" aria-label="ACHILLES home">
+                <Link href={dashboard ? dashboard.href : "/"} className="shrink-0" aria-label="ACHILLES home">
                     <img src="/logo.png" alt="ACHILLES" className="h-12 w-auto" />
                 </Link>
 

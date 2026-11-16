@@ -43,6 +43,7 @@ export async function registerUser(
         Email: email,
         Name: name,
         PasswordHash: hash,
+        Role: "customer",
     });
 
     return { success: true };

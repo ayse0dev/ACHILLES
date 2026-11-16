@@ -2,7 +2,11 @@ import { NextResponse } from "next/server";
 import type { NextRequest } from "next/server";
 import { getToken } from "next-auth/jwt";
 
-const adminAllowed = ["/admin", "/profile", "/settings"];
+const allowedByRole: Record<string, string[]> = {
+    admin: ["/admin", "/profile", "/settings"],
+    staff: ["/staff", "/profile", "/settings"],
+};
+const homeByRole: Record<string, string> = { admin: "/admin", staff: "/staff" };
 
 export async function proxy(request: NextRequest) {
     if (process.env.NODE_ENV === "production" && request.headers.get("x-forwarded-proto") === "http") {
@@ -14,11 +18,12 @@ export async function proxy(request: NextRequest) {
     const token = await getToken({ req: request, secret: process.env.NEXTAUTH_SECRET });
     const role = String(token?.role ?? "").toLowerCase();
 
-    if (role === "admin") {
+    const allowedPaths = allowedByRole[role];
+    if (allowedPaths) {
         const path = request.nextUrl.pathname;
-        const allowed = adminAllowed.some((p) => path === p || path.startsWith(`${p}/`));
+        const allowed = allowedPaths.some((p) => path === p || path.startsWith(`${p}/`));
         if (!allowed) {
-            return NextResponse.redirect(new URL("/admin", request.url));
+            return NextResponse.redirect(new URL(homeByRole[role], request.url));
         }
     }
 

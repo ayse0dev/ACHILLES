@@ -7,6 +7,7 @@ import AdminOrderRow from "@/components/AdminOrderRow";
 import AdminStockRow from "@/components/AdminStockRow";
 import AdminUserRow from "@/components/AdminUserRow";
 import AdminTicketRow from "@/components/AdminTicketRow";
+import CreateAccountForm from "@/components/CreateAccountForm";
 import MoneyFlow from "@/components/MoneyFlow";
 import TrendChart from "@/components/TrendChart";
 import AutoRefresh from "@/components/AutoRefresh";
@@ -379,6 +380,8 @@ export default async function DashboardView({ mode, tab = "overview" }: { mode: 
 
             {activeTab === "users" && admin && (
                 <section className="space-y-4">
+                    <h2 className="font-black uppercase">Create a staff account</h2>
+                    <CreateAccountForm />
                     <p className="text-sm text-ink/70">Change what each account can access. Admins can manage everything, staff can run orders, repairs and stock.</p>
                     {userRecords.map((u) => {
                         const f = u.fields as { Name?: string; Email?: string; Role?: string };
