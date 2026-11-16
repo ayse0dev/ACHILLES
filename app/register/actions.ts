@@ -3,6 +3,7 @@
 import bcrypt from "bcryptjs";
 import { z } from "zod";
 import { base } from "@/lib/airtable";
+import { findUserByEmail } from "@/lib/users";
 
 const schema = z.object({
     name: z.string().min(2),
@@ -27,16 +28,8 @@ export async function registerUser(
     }
 
     const { name, email, password } = parsed.data;
-    const safeEmail = email.replace(/"/g, '\\"');
 
-    const existing = await base("Users")
-        .select({
-            filterByFormula: `{Email} = "${safeEmail}"`,
-            maxRecords: 1,
-        })
-        .firstPage();
-
-    if (existing.length > 0) {
+    if (await findUserByEmail(email)) {
         return { error: "An account with this email already exists." };
     }
 

@@ -9,6 +9,5 @@ export function GET(request: Request) {
     if (/android/i.test(ua)) {
         return Response.redirect(playStore, 302);
     }
-    // Desktop or iPad → show download page
     return Response.redirect(new URL("/download", request.url), 302);
 }

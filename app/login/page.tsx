@@ -31,39 +31,41 @@ function LoginForm() {
     }
 
     return (
-        <div className="max-w-md mx-auto p-6 space-y-4">
-            <h1 className="text-2xl font-bold">Log in</h1>
-            <form onSubmit={onSubmit} className="space-y-3">
-                <input
-                    type="email"
-                    placeholder="Email"
-                    value={email}
-                    onChange={(e) => setEmail(e.target.value)}
-                    required
-                    className="w-full border rounded px-3 py-2"
-                />
-                <input
-                    type="password"
-                    placeholder="Password"
-                    value={password}
-                    onChange={(e) => setPassword(e.target.value)}
-                    required
-                    className="w-full border rounded px-3 py-2"
-                />
-                {error && <p className="text-red-600 text-sm">{error}</p>}
-                <button
-                    disabled={loading}
-                    className="w-full bg-black text-white rounded py-2 disabled:opacity-50"
-                >
-                    {loading ? "Signing in..." : "Log in"}
-                </button>
-            </form>
-            <p className="text-sm">
-                No account?{" "}
-                <a href="/register" className="underline">
-                    Register
-                </a>
-            </p>
+        <div className="max-w-md mx-auto px-4 py-12">
+            <div className="card p-8 space-y-5">
+                <div>
+                    <p className="eyebrow mb-1">Welcome back</p>
+                    <h1 className="page-title !text-3xl">Log in</h1>
+                </div>
+                <form onSubmit={onSubmit} className="space-y-3">
+                    <input
+                        type="email"
+                        placeholder="Email"
+                        value={email}
+                        onChange={(e) => setEmail(e.target.value)}
+                        required
+                        className="field"
+                    />
+                    <input
+                        type="password"
+                        placeholder="Password"
+                        value={password}
+                        onChange={(e) => setPassword(e.target.value)}
+                        required
+                        className="field"
+                    />
+                    {error && <p className="text-red text-sm">{error}</p>}
+                    <button disabled={loading} className="btn btn-accent w-full">
+                        {loading ? "Signing in..." : "Log in"}
+                    </button>
+                </form>
+                <p className="text-sm text-center">
+                    No account?{" "}
+                    <a href="/register" className="font-bold text-purple underline">
+                        Register
+                    </a>
+                </p>
+            </div>
         </div>
     );
 }

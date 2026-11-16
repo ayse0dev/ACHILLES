@@ -19,43 +19,34 @@ export default function RegisterPage() {
     }, [state.success, router]);
 
     return (
-        <div className="max-w-md mx-auto p-6 space-y-4">
-            <h1 className="text-2xl font-bold">Create account</h1>
-            <form action={formAction} className="space-y-3">
-                <input
-                    name="name"
-                    placeholder="Full name"
-                    required
-                    className="w-full border rounded px-3 py-2"
-                />
-                <input
-                    name="email"
-                    type="email"
-                    placeholder="Email"
-                    required
-                    className="w-full border rounded px-3 py-2"
-                />
-                <input
-                    name="password"
-                    type="password"
-                    placeholder="Password (min 8 chars)"
-                    required
-                    className="w-full border rounded px-3 py-2"
-                />
-                {state.error && <p className="text-red-600 text-sm">{state.error}</p>}
+        <div className="max-w-md mx-auto px-4 py-12">
+            <div className="card p-8 space-y-5">
+                <div>
+                    <p className="eyebrow mb-1">Join ACHILLES</p>
+                    <h1 className="page-title !text-3xl">Create account</h1>
+                </div>
+                <form action={formAction} className="space-y-3">
+                    <input name="name" placeholder="Full name" required className="field" />
+                    <input name="email" type="email" placeholder="Email" required className="field" />
+                    <input
+                        name="password"
+                        type="password"
+                        placeholder="Password (min 8 chars)"
+                        required
+                        className="field"
+                    />
+                    {state.error && <p className="text-red text-sm">{state.error}</p>}
+                    <button disabled={isPending} className="btn btn-accent w-full">
+                        {isPending ? "Creating..." : "Register"}
+                    </button>
+                </form>
                 <button
-                    disabled={isPending}
-                    className="w-full bg-black text-white rounded py-2 disabled:opacity-50"
+                    onClick={() => signIn("credentials", { email: "", password: "" })}
+                    className="text-sm underline w-full text-center"
                 >
-                    {isPending ? "Creating..." : "Register"}
+                    Already have an account? Log in
                 </button>
-            </form>
-            <button
-                onClick={() => signIn("credentials", { email: "", password: "" })}
-                className="text-sm underline"
-            >
-                Already have an account? Log in
-            </button>
+            </div>
         </div>
     );
 }

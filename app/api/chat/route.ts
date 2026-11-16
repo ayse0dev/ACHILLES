@@ -20,7 +20,7 @@ export async function POST(req: Request) {
         productContext = "(product catalog temporarily unavailable)";
     }
 
-    const system = `You are the SoleFix assistant — a friendly helper for a shoe shop that also repairs shoes.
+    const system = `You are the ACHILLES assistant — a friendly helper for a shoe shop that also repairs shoes.
 Available products:
 ${productContext}
 
@@ -33,7 +33,7 @@ You can answer questions about:
 Keep answers short and helpful. If asked about specific stock we don't list, say "check the shop page for the latest availability."`;
 
     const result = streamText({
-        model: google("gemini-2.5-flash"), // Changed model
+        model: google("gemini-2.5-flash"),
         system,
         messages,
     });

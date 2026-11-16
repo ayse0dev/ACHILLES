@@ -35,8 +35,12 @@ export async function getProducts(opts?: {
 
     const data = await fetchFromAirtable(query);
 
+    const products = data.records
+        .map((r: any) => mapProduct(r))
+        .filter((p: Product) => p.name.trim() !== "" && p.price > 0);
+
     return {
-        products: data.records.map((r: any) => mapProduct(r)),
+        products,
         nextOffset: data.offset,
     };
 }

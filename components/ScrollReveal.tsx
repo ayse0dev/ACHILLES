@@ -6,7 +6,6 @@ import { useInView } from "react-intersection-observer";
 interface ScrollRevealProps {
   children: ReactNode;
   className?: string;
-  /** animation distance in px (default 30) */
   offset?: number;
 }
 

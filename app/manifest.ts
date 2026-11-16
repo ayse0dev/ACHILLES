@@ -2,8 +2,8 @@ import type { MetadataRoute } from "next";
 
 export default function manifest(): MetadataRoute.Manifest {
     return {
-        name: "SoleFix — Shop & Repair Shoes",
-        short_name: "SoleFix",
+        name: "ACHILLES — Shop & Repair Shoes",
+        short_name: "ACHILLES",
         description: "Buy shoes and get them repaired. Download our mobile app.",
         start_url: "/",
         display: "standalone",

@@ -3,6 +3,7 @@
 import { base } from "@/lib/airtable";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
+import { sendEmail } from "@/lib/mail";
 import { z } from "zod";
 
 const schema = z.object({
@@ -34,18 +35,25 @@ export async function submitRepair(
     }
 
     const session = await getServerSession(authOptions);
+    const d = parsed.data;
 
     await base("RepairRequests").create({
-        Name: parsed.data.name,
-        Email: parsed.data.email,
-        Phone: parsed.data.phone ?? "",
-        ShoeDescription: parsed.data.shoeDescription,
-        Issue: parsed.data.issue,
-        PhotoUrl: parsed.data.photoUrl || undefined,
+        Name: d.name,
+        Email: d.email,
+        Phone: d.phone ?? "",
+        ShoeDescription: d.shoeDescription,
+        Issue: d.issue,
+        PhotoUrl: d.photoUrl || undefined,
         Status: "Pending",
         SubmittedAt: new Date().toISOString(),
-        UserId: (session?.user as any)?.id ?? "",
+        UserId: (session?.user as { id?: string } | undefined)?.id ?? "",
     });
+
+    await sendEmail(
+        d.email,
+        "We received your ACHILLES repair request",
+        `Hi ${d.name},\n\nThanks for sending us your ${d.shoeDescription}. We'll email you a quote within 24 hours.\n\nYou can check progress any time on the Track page.`
+    );
 
     return { success: true };
 }

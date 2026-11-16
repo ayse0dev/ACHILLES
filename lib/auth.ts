@@ -3,7 +3,8 @@ import GoogleProvider from "next-auth/providers/google";
 import FacebookProvider from "next-auth/providers/facebook";
 import CredentialsProvider from "next-auth/providers/credentials";
 import bcrypt from "bcryptjs";
-import { base } from "./airtable";
+import { findUserByEmail } from "./users";
+import { normalizeRole } from "./roles";
 import { verifyOTP } from "@/lib/otp";
 
 export const authOptions: NextAuthOptions = {
@@ -34,47 +35,30 @@ export const authOptions: NextAuthOptions = {
             async authorize(credentials) {
                 if (!credentials?.email) return null;
 
-                const safeEmail = credentials.email.replace(/"/g, '\\"');
-                const records = await base("Users")
-                    .select({
-                        filterByFormula: `{Email} = "${safeEmail}"`,
-                        maxRecords: 1,
-                    })
-                    .firstPage();
+                const record = await findUserByEmail(credentials.email);
+                if (!record) return null;
 
-                if (records.length === 0) return null;
-
-                const user = records[0].fields as {
+                const user = record.fields as {
                     Email: string;
                     Name?: string;
                     PasswordHash?: string;
+                    Role?: string;
                 };
-
-                // If OTP is provided, verify OTP
-                if (credentials.otp) {
-                    const validOtp = verifyOTP(credentials.email, credentials.otp);
-                    if (!validOtp) return null;
-                    return {
-                        id: records[0].id,
-                        email: user.Email,
-                        name: user.Name ?? user.Email.split("@")[0],
-                    };
-                }
-
-                // Password check fallback
-                if (!credentials.password || !user.PasswordHash) return null;
-
-                const valid = await bcrypt.compare(
-                    credentials.password,
-                    user.PasswordHash
-                );
-                if (!valid) return null;
-
-                return {
-                    id: records[0].id,
+                const sessionUser = {
+                    id: record.id,
                     email: user.Email,
                     name: user.Name ?? user.Email.split("@")[0],
+                    role: normalizeRole(user.Role),
                 };
+
+                if (credentials.otp) {
+                    const validOtp = await verifyOTP(credentials.email, credentials.otp);
+                    return validOtp ? sessionUser : null;
+                }
+
+                if (!credentials.password || !user.PasswordHash) return null;
+                const valid = await bcrypt.compare(credentials.password, user.PasswordHash);
+                return valid ? sessionUser : null;
             },
         }),
     ],
@@ -83,11 +67,18 @@ export const authOptions: NextAuthOptions = {
     secret: process.env.NEXTAUTH_SECRET,
     callbacks: {
         async jwt({ token, user }) {
-            if (user) token.id = user.id;
+            if (user) {
+                token.id = user.id;
+                token.role = (user as { role?: string }).role ?? "customer";
+            }
             return token;
         },
         async session({ session, token }) {
-            if (session.user) (session.user as any).id = token.id;
+            if (session.user) {
+                const u = session.user as { id?: unknown; role?: unknown };
+                u.id = token.id;
+                u.role = token.role;
+            }
             return session;
         },
     },
