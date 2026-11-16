@@ -71,39 +71,36 @@ function LoginForm() {
                 )}
 
                 {step === "code" && (
-                    <form onSubmit={onVerify} className="space-y-3">
-                        <p className="text-sm text-ink/70">
-                            We emailed a 6-digit code to <span className="font-bold">{email}</span>. It expires in 5 minutes.
-                        </p>
-                        <input
-                            inputMode="numeric"
-                            pattern="[0-9]{6}"
-                            maxLength={6}
-                            placeholder="6-digit code"
-                            value={otp}
-                            onChange={(e) => setOtp(e.target.value.replace(/\D/g, ""))}
-                            required
-                            autoFocus
-                            className="field tracking-[0.4em] text-center text-lg"
-                        />
-                        {error && <p className="text-red text-sm">{error}</p>}
-                        <button disabled={signingIn || otp.length !== 6} className="btn btn-accent w-full">
-                            {signingIn ? "Logging in..." : "Log in"}
-                        </button>
-                        <button
-                            type="button"
-                            onClick={() => {
-                                const form = new FormData();
-                                form.set("email", email);
-                                form.set("password", password);
-                                requestAction(form);
-                            }}
-                            disabled={requesting}
-                            className="text-sm underline w-full text-center"
-                        >
-                            {requesting ? "Sending..." : "Send a new code"}
-                        </button>
-                    </form>
+                    <div className="space-y-3">
+                        <form onSubmit={onVerify} className="space-y-3">
+                            <p className="text-sm text-ink/70">
+                                We emailed a 6-digit code to <span className="font-bold">{email}</span>. It expires in 5 minutes.
+                            </p>
+                            <input
+                                inputMode="numeric"
+                                pattern="[0-9]{6}"
+                                maxLength={6}
+                                placeholder="6-digit code"
+                                value={otp}
+                                onChange={(e) => setOtp(e.target.value.replace(/\D/g, ""))}
+                                required
+                                autoFocus
+                                className="field tracking-[0.4em] text-center text-lg"
+                            />
+                            {error && <p className="text-red text-sm">{error}</p>}
+                            <button disabled={signingIn || otp.length !== 6} className="btn btn-accent w-full">
+                                {signingIn ? "Logging in..." : "Log in"}
+                            </button>
+                        </form>
+                        <form action={requestAction} className="text-center">
+                            <input type="hidden" name="email" value={email} />
+                            <input type="hidden" name="password" value={password} />
+                            <button disabled={requesting} className="text-sm underline">
+                                {requesting ? "Sending..." : "Send a new code"}
+                            </button>
+                        </form>
+                        {requestState.error && <p className="text-red text-sm">{requestState.error}</p>}
+                    </div>
                 )}
 
                 <p className="text-sm text-center">

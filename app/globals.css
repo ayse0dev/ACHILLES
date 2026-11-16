@@ -141,3 +141,94 @@ body {
   .abstract-hero .blob,
   .abstract-hero .ring { animation: none; }
 }
+
+@keyframes fade-in {
+  from { opacity: 0; transform: translateY(10px) scale(0.99); }
+  to { opacity: 1; transform: none; }
+}
+.animate-fade-in {
+  animation: fade-in 0.7s ease both;
+}
+
+.scroll-progress {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 4px;
+  z-index: 60;
+  transform-origin: 0 50%;
+  transform: scaleX(0);
+  background: linear-gradient(90deg, #19b3c4, #8b3fc7, #ff7a3d, #ffc83d);
+}
+
+.reveal {
+  opacity: 0;
+  transform: translateY(32px);
+  transition: opacity 0.8s cubic-bezier(0.2, 0.7, 0.2, 1), transform 0.8s cubic-bezier(0.2, 0.7, 0.2, 1);
+}
+.reveal.in {
+  opacity: 1;
+  transform: none;
+}
+
+.gradient-text-bright {
+  background: linear-gradient(90deg, #19b3c4, #8b3fc7, #ff7a3d, #ffc83d);
+  background-size: 200% auto;
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  animation: shimmer 6s linear infinite;
+}
+
+@keyframes shimmer {
+  to { background-position: 200% center; }
+}
+
+@keyframes drift {
+  0%, 100% { transform: translate(0, 0) scale(1); }
+  50% { transform: translate(40px, -30px) scale(1.08); }
+}
+.animate-drift { animation: drift 16s ease-in-out infinite; }
+.animate-drift-slow { animation: drift 24s ease-in-out infinite reverse; }
+
+@keyframes float {
+  0%, 100% { transform: translateY(0) rotate(-2deg); }
+  50% { transform: translateY(-14px) rotate(1deg); }
+}
+.animate-float { animation: float 6s ease-in-out infinite; }
+
+@keyframes pulse-slow {
+  0%, 100% { opacity: 0.45; transform: scale(1); }
+  50% { opacity: 0.8; transform: scale(1.08); }
+}
+.animate-pulse-slow { animation: pulse-slow 5s ease-in-out infinite; }
+
+@keyframes spin-slow {
+  to { transform: rotate(360deg); }
+}
+.animate-spin-slow { animation: spin-slow 28s linear infinite; }
+
+@media (prefers-reduced-motion: reduce) {
+  .animate-drift, .animate-drift-slow, .animate-float, .animate-pulse-slow, .animate-spin-slow, .gradient-text-bright {
+    animation: none;
+  }
+  .reveal { opacity: 1; transform: none; transition: none; }
+}
+
+@keyframes cloud-drift {
+  0%, 100% { transform: translateX(0); }
+  50% { transform: translateX(18px); }
+}
+.animate-cloud { animation: cloud-drift 9s ease-in-out infinite; }
+.animate-cloud-slow { animation: cloud-drift 13s ease-in-out infinite reverse; }
+
+@keyframes wiggle {
+  0%, 100% { transform: rotate(-6deg) translateY(0); }
+  50% { transform: rotate(8deg) translateY(-8px); }
+}
+.animate-wiggle { animation: wiggle 4s ease-in-out infinite; }
+
+@media (prefers-reduced-motion: reduce) {
+  .animate-cloud, .animate-cloud-slow, .animate-wiggle { animation: none; }
+}

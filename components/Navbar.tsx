@@ -20,7 +20,7 @@ export default function Navbar() {
         <header className="sticky top-0 z-40 bg-white/90 backdrop-blur border-b border-ink/10">
             <nav className="max-w-7xl mx-auto px-4 md:px-6 h-16 flex items-center justify-between gap-6">
                 <Link href="/" className="font-black text-2xl tracking-tight uppercase text-ink">
-                    Achilles<span className="text-orange">.</span>
+                    <img src="/logo.png" alt="ACHILLES" className="h-12 w-auto" />
                 </Link>
 
                 <ul className="hidden md:flex items-center gap-7">

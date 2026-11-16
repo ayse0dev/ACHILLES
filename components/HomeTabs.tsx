@@ -10,58 +10,77 @@ type Tab = {
     points: string[];
     href: string;
     cta: string;
+    image?: string;
+    artName: string;
 };
+
+const accents = [
+    { ring: "from-teal to-purple", glow: "bg-teal/50", point: "text-teal", chip: "bg-teal" },
+    { ring: "from-purple to-orange", glow: "bg-purple/60", point: "text-purple", chip: "bg-purple" },
+    { ring: "from-orange to-yellow", glow: "bg-orange/50", point: "text-orange", chip: "bg-orange" },
+];
 
 export default function HomeTabs({ tabs, dark = false }: { tabs: Tab[]; dark?: boolean }) {
     const [active, setActive] = useState(tabs[0].key);
-    const tab = tabs.find((t) => t.key === active) ?? tabs[0];
-
-    const pillBase = dark ? "bg-white/10 border-white/15" : "bg-white border-ink/10";
-    const textMain = dark ? "text-white" : "text-ink";
-    const textSoft = dark ? "text-white/80" : "text-ink/80";
-    const panel = dark ? "bg-white/5 text-white" : "bg-gradient-to-br from-teal/30 via-purple/25 to-orange/35 text-ink/25";
+    const index = Math.max(0, tabs.findIndex((t) => t.key === active));
+    const tab = tabs[index];
+    const accent = accents[index % accents.length];
 
     return (
-        <div className="space-y-8">
-            <div className={`inline-flex flex-wrap gap-2 p-1.5 rounded-full border ${pillBase}`}>
-                {tabs.map((t) => (
-                    <button
-                        key={t.key}
-                        type="button"
-                        aria-pressed={active === t.key}
-                        onClick={() => setActive(t.key)}
-                        className={`px-5 py-2 rounded-full text-sm font-bold uppercase tracking-wide transition ${
-                            active === t.key
-                                ? dark ? "bg-white text-ink" : "bg-ink text-white"
-                                : `${textMain} hover:opacity-70`
-                        }`}
-                    >
-                        {t.label}
-                    </button>
-                ))}
+        <div className="space-y-10">
+            <div className="inline-flex flex-wrap gap-2 p-1.5 rounded-full bg-white/10 backdrop-blur border border-white/15">
+                {tabs.map((t, i) => {
+                    const on = active === t.key;
+                    return (
+                        <button
+                            key={t.key}
+                            type="button"
+                            aria-pressed={on}
+                            onClick={() => setActive(t.key)}
+                            className={`relative px-5 py-2 rounded-full text-sm font-bold uppercase tracking-wide transition duration-300 ${
+                                on
+                                    ? `bg-gradient-to-r ${accents[i % accents.length].ring} text-white shadow-[0_8px_24px_-6px_rgba(139,63,199,0.8)] scale-105`
+                                    : "text-white/80 hover:text-white hover:bg-white/10"
+                            }`}
+                        >
+                            {t.label}
+                        </button>
+                    );
+                })}
             </div>
-            <div className="grid md:grid-cols-2 gap-10 items-center">
-                <div className="space-y-5">
-                    <h3 className={`uppercase font-black text-3xl md:text-4xl tracking-tight leading-tight ${textMain}`}>
+
+            <div key={tab.key} className="grid md:grid-cols-2 gap-10 items-center animate-fade-in">
+                <div className="space-y-6">
+                    <span className={`inline-block h-1.5 w-16 rounded-full bg-gradient-to-r ${accent.ring}`} />
+                    <h3 className="uppercase font-black text-3xl md:text-4xl tracking-tight leading-tight text-white">
                         {tab.title}
                     </h3>
-                    <ul className={`space-y-3 ${textSoft}`}>
+                    <ul className="space-y-4 text-white/85">
                         {tab.points.map((p) => (
-                            <li key={p} className="flex gap-3">
-                                <span className="text-yellow font-black">→</span>
+                            <li key={p} className="flex gap-3 items-start">
+                                <span className={`mt-1 h-2.5 w-2.5 rounded-full shrink-0 ${accent.chip}`} />
                                 <span>{p}</span>
                             </li>
                         ))}
                     </ul>
                     <Link
                         href={tab.href}
-                        className={`btn uppercase text-sm tracking-wide ${dark ? "bg-white text-ink" : "btn-ink"}`}
+                        className={`inline-flex btn uppercase text-sm tracking-wide bg-gradient-to-r ${accent.ring} text-white hover:scale-105 transition`}
                     >
                         {tab.cta}
                     </Link>
                 </div>
-                <div className={`rounded-3xl aspect-[4/3] flex items-center justify-center ${panel}`}>
-                    <span className="uppercase font-black text-5xl md:text-6xl tracking-tight">{tab.label}</span>
+
+                <div className="relative flex items-center justify-center aspect-[4/3]">
+                    <span className={`absolute inset-0 m-auto w-4/5 h-4/5 rounded-full blur-3xl ${accent.glow} animate-pulse-slow`} />
+                    <span className={`absolute inset-0 m-auto w-3/5 h-3/5 rounded-[40%] border-2 border-white/20 animate-spin-slow`} />
+                    {tab.image ? (
+                        <img
+                            src={tab.image}
+                            alt={tab.artName}
+                            className="relative max-h-full max-w-full object-contain drop-shadow-[0_30px_40px_rgba(0,0,0,0.5)] animate-float"
+                        />
+                    ) : null}
                 </div>
             </div>
         </div>

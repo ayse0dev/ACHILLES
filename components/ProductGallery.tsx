@@ -1,36 +1,40 @@
 "use client";
 
 import { useState } from "react";
+import ProductArt from "./ProductArt";
 
 export default function ProductGallery({ images, name }: { images: string[]; name: string }) {
+    const views = images.length > 0 ? images : [""];
     const [active, setActive] = useState(0);
-    const current = images[active];
+    const current = views[active];
 
     return (
         <div className="grid grid-cols-[4rem_1fr] md:grid-cols-[5rem_1fr] gap-4">
             <div className="flex flex-col gap-3">
-                {images.map((src, i) => (
+                {views.map((src, i) => (
                     <button
-                        key={src + i}
+                        key={i}
                         type="button"
                         onClick={() => setActive(i)}
-                        aria-label={`Show image ${i + 1}`}
+                        aria-label={`Show view ${i + 1}`}
                         aria-pressed={active === i}
-                        className={`aspect-square rounded-xl bg-[#f3f1ee] overflow-hidden border-2 ${
+                        className={`aspect-square rounded-xl overflow-hidden border-2 bg-[#f3f1ee] ${
                             active === i ? "border-ink" : "border-transparent"
                         }`}
                     >
-                        <img src={src} alt="" className="w-full h-full object-contain p-1" />
+                        {src ? (
+                            <img src={src} alt="" className="w-full h-full object-contain p-1" />
+                        ) : (
+                            <ProductArt name={`${name} 0`} />
+                        )}
                     </button>
                 ))}
             </div>
-            <div className="aspect-square rounded-3xl bg-[#f3f1ee] overflow-hidden">
+            <div className="aspect-square rounded-3xl overflow-hidden bg-[#f3f1ee]">
                 {current ? (
                     <img src={current} alt={name} className="w-full h-full object-contain p-6" />
                 ) : (
-                    <div className="flex items-center justify-center h-full bg-gradient-to-br from-teal/25 via-purple/20 to-orange/30">
-                        <span className="font-black text-8xl text-ink/25 uppercase">{name.charAt(0)}</span>
-                    </div>
+                    <ProductArt name={name} />
                 )}
             </div>
         </div>

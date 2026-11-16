@@ -36,7 +36,7 @@ export default function Footer() {
             <div className="max-w-7xl mx-auto px-4 md:px-6 py-16 grid gap-12 md:grid-cols-4">
                 <div className="space-y-4">
                     <p className="font-black text-3xl tracking-tight uppercase">
-                        Achilles<span className="text-orange">.</span>
+                        <img src="/logo.png" alt="ACHILLES" className="h-20 w-auto" />
                     </p>
                     <p className="text-sm text-white/70 max-w-xs">
                         Shoes you love, and repairs that bring them back.

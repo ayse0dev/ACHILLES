@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { useActionState } from "react";
 import { submitRepair, RepairState } from "./actions";
+import BeforeAfter from "@/components/BeforeAfter";
 
 const initial: RepairState = {};
 
@@ -15,14 +16,29 @@ const services = [
     { name: "Stretching", note: "Make a tight pair comfortable again" },
 ];
 
+const transformations = [
+    { label: "Derby", before: "/before-after/derby-before.jpg", after: "/before-after/derby-after.jpg" },
+    { label: "Loafer", before: "/before-after/loafer-before.jpg", after: "/before-after/loafer-after.jpg" },
+    { label: "Sneaker", before: "/before-after/sneaker-before.jpg", after: "/before-after/sneaker-after.jpg" },
+    { label: "Sandal", before: "/before-after/sandal-before.jpg", after: "/before-after/sandal-after.jpg" },
+];
+
 export default function RepairPage() {
     const [state, formAction, isPending] = useActionState(submitRepair, initial);
 
     return (
         <div className="max-w-5xl mx-auto px-4 py-10 space-y-14">
+            <section className="space-y-6">
+                <div>
+                    <p className="eyebrow mb-2">The transformation</p>
+                    <h1 className="page-title">Worn out. Brought back.</h1>
+                </div>
+                <BeforeAfter pairs={transformations} />
+            </section>
+
             <section>
                 <p className="eyebrow mb-2">Repair services</p>
-                <h1 className="page-title mb-6">Give your shoes a second life</h1>
+                <h2 className="page-title mb-6 !text-3xl">Give your shoes a second life</h2>
                 <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
                     {services.map((s, i) => (
                         <div
@@ -30,7 +46,7 @@ export default function RepairPage() {
                             className="card p-5 border-t-4"
                             style={{ borderColor: ["#19b3c4", "#8b3fc7", "#ff7a3d", "#ffc83d", "#e8374f", "#19b3c4"][i] }}
                         >
-                            <h2 className="font-display font-bold text-xl">{s.name}</h2>
+                            <h3 className="font-display font-bold text-xl">{s.name}</h3>
                             <p className="text-sm text-ink/70 mt-1">{s.note}</p>
                             <p className="text-xs mt-3 font-bold text-purple">Quote after inspection</p>
                         </div>

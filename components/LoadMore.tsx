@@ -16,14 +16,16 @@ const sortOptions: { key: SortKey; label: string }[] = [
 
 export default function LoadMore({
     initialProducts,
+    initialOffset,
 }: {
     initialProducts: Product[];
+    initialOffset?: string;
 }) {
     const params = useSearchParams();
     const [products, setProducts] = useState(initialProducts);
-    const [offset, setOffset] = useState<string | undefined>();
+    const [offset, setOffset] = useState<string | undefined>(initialOffset);
     const [loading, setLoading] = useState(false);
-    const [done, setDone] = useState(false);
+    const [done, setDone] = useState(!initialOffset);
     const [query, setQuery] = useState("");
     const [category, setCategory] = useState<string>(params.get("category") ?? "All");
     const [sort, setSort] = useState<SortKey>("featured");
@@ -49,17 +51,23 @@ export default function LoadMore({
     }, [products, query, category, sort]);
 
     async function loadMore() {
+        if (!offset) return;
         setLoading(true);
         try {
-            const res = await fetch(`/api/products?limit=12${offset ? `&offset=${offset}` : ""}`);
+            const res = await fetch(`/api/products?limit=12&offset=${encodeURIComponent(offset)}`);
             const data = await res.json();
-            if (!data.products?.length) {
+            const incoming: Product[] = data.products ?? [];
+            if (incoming.length === 0) {
                 setDone(true);
-            } else {
-                setProducts((prev) => [...prev, ...data.products]);
-                setOffset(data.nextOffset);
-                if (!data.nextOffset) setDone(true);
+                setOffset(undefined);
+                return;
             }
+            setProducts((prev) => {
+                const seen = new Set(prev.map((p) => p.id));
+                return [...prev, ...incoming.filter((p) => !seen.has(p.id))];
+            });
+            setOffset(data.nextOffset);
+            if (!data.nextOffset) setDone(true);
         } finally {
             setLoading(false);
         }

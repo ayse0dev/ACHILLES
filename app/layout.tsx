@@ -4,6 +4,7 @@ import Navbar from "@/components/Navbar";
 import AnnouncementBar from "@/components/AnnouncementBar";
 import ChatWidget from "@/components/ChatWidget";
 import Footer from "@/components/Footer";
+import ScrollMotion from "@/components/ScrollMotion";
 
 export const metadata = {
     title: "ACHILLES — Shop & Repair Shoes",
@@ -22,6 +23,7 @@ export default function RootLayout({
                 <Providers>
                     <AnnouncementBar />
                     <Navbar />
+                    <ScrollMotion />
                     <main className="min-h-screen">{children}</main>
                     <ChatWidget />
                     <Footer />

@@ -3,9 +3,15 @@ export const ROLES = ["customer", "staff", "admin"] as const;
 export type Role = (typeof ROLES)[number];
 
 export function normalizeRole(value: unknown): Role {
-    return ROLES.includes(value as Role) ? (value as Role) : "customer";
+    const cleaned = typeof value === "string" ? value.trim().toLowerCase() : "";
+    return ROLES.includes(cleaned as Role) ? (cleaned as Role) : "customer";
 }
 
 export function isStaff(role: string | undefined): boolean {
-    return role === "staff" || role === "admin";
+    const r = normalizeRole(role);
+    return r === "staff" || r === "admin";
+}
+
+export function isAdmin(role: string | undefined): boolean {
+    return normalizeRole(role) === "admin";
 }
