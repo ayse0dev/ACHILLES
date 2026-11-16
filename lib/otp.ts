@@ -1,7 +1,7 @@
 import crypto from "crypto";
 import { base } from "./airtable";
 import { findUserByEmail } from "./users";
-import { sendEmail } from "./mail";
+import { isMailConfigured, sendEmail } from "./mail";
 
 const CODE_TTL_MS = 5 * 60 * 1000;
 
@@ -31,6 +31,9 @@ export async function verifyOTP(email: string, code: string): Promise<boolean> {
 }
 
 export async function sendOtpEmail(email: string, code: string) {
+    if (!isMailConfigured()) {
+        throw new Error("Email is not configured: set BREVO_SMTP_USER, BREVO_SMTP_KEY and MAIL_FROM.");
+    }
     await sendEmail(
         email,
         "Your ACHILLES login code",
