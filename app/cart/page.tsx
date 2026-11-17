@@ -2,7 +2,6 @@
 
 import Link from "next/link";
 import { useCart } from "@/components/CartProvider";
-import CheckoutButton from "@/components/CheckoutButton";
 
 export default function CartPage() {
     const { items, subtotal, setQty, remove, clear } = useCart();
@@ -72,7 +71,7 @@ export default function CartPage() {
                 </div>
                 <div className="flex gap-3 items-center">
                     <button onClick={clear} className="btn btn-ghost text-sm">Clear cart</button>
-                    <CheckoutButton />
+                    <Link href="/checkout" className="btn btn-accent">Checkout</Link>
                 </div>
             </div>
         </div>

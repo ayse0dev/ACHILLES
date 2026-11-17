@@ -15,6 +15,7 @@ export async function createCheckoutSession(input: {
     email: string;
     successUrl: string;
     cancelUrl: string;
+    methods: string[];
     metadata: Record<string, string>;
 }): Promise<{ id: string; url: string }> {
     const res = await fetch(`${API}/checkout_sessions`, {
@@ -24,7 +25,7 @@ export async function createCheckoutSession(input: {
             data: {
                 attributes: {
                     line_items: input.lines.map((l) => ({ currency: "PHP", amount: l.amount, name: l.name, quantity: l.quantity })),
-                    payment_method_types: ["gcash", "paymaya", "card"],
+                    payment_method_types: input.methods,
                     billing: { email: input.email },
                     customer_email: input.email,
                     success_url: input.successUrl,

@@ -55,15 +55,16 @@ function LoginForm() {
                 {step === "credentials" && (
                     <form
                         action={(formData) => {
-                            setEmail(String(formData.get("email") ?? ""));
+                            setEmail(String(formData.get("identifier") ?? ""));
                             setPassword(String(formData.get("password") ?? ""));
                             requestAction(formData);
                         }}
                         className="space-y-3"
                     >
-                        <input name="email" type="email" placeholder="Email" required className="field" />
+                        <input name="identifier" placeholder="Email or username" required autoComplete="username" className="field" />
                         <input name="password" type="password" placeholder="Password" required className="field" />
                         {requestState.error && <p className="text-red text-sm">{requestState.error}</p>}
+                        <a href="/forgot" className="block text-sm underline text-right">Forgot password?</a>
                         <button disabled={requesting} className="btn btn-accent w-full">
                             {requesting ? "Checking..." : "Continue"}
                         </button>
@@ -74,7 +75,7 @@ function LoginForm() {
                     <div className="space-y-3">
                         <form onSubmit={onVerify} className="space-y-3">
                             <p className="text-sm text-ink/70">
-                                We emailed a 6-digit code to <span className="font-bold">{email}</span>. It expires in 5 minutes.
+                                We emailed a 6-digit code to <span className="font-bold">{requestState.sentTo ?? "your email"}</span>. It expires in 5 minutes.
                             </p>
                             <input
                                 inputMode="numeric"
@@ -93,7 +94,7 @@ function LoginForm() {
                             </button>
                         </form>
                         <form action={requestAction} className="text-center">
-                            <input type="hidden" name="email" value={email} />
+                            <input type="hidden" name="identifier" value={email} />
                             <input type="hidden" name="password" value={password} />
                             <button disabled={requesting} className="text-sm underline">
                                 {requesting ? "Sending..." : "Send a new code"}

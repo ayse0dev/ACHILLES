@@ -10,11 +10,11 @@ import { formulaString } from "@/lib/formula";
 import { sendEmail } from "@/lib/mail";
 import { notify } from "@/lib/notify";
 import { audit } from "@/lib/audit";
-import { isAdmin, isStaff } from "@/lib/roles";
+import { isAdmin, isStaff, roleLabel } from "@/lib/roles";
 import { getCurrentUser } from "@/lib/session";
 
 const REPAIR_STATUSES = ["Pending", "In progress", "Ready", "Completed"] as const;
-const ORDER_STATUSES = ["Paid", "Packed", "Shipped", "Delivered"] as const;
+const ORDER_STATUSES = ["Pending payment", "Paid", "Confirmed", "Packed", "Shipped", "Delivered", "Cancelled"] as const;
 const TICKET_STATUSES = ["Open", "In progress", "Resolved"] as const;
 const ROLE_OPTIONS =["customer", "staff", "admin"] as const;
 
@@ -152,7 +152,7 @@ export async function updateRole(_prev: AdminState, formData: FormData): Promise
     }
 
     await audit(user.email, "change_role", parsed.data.id, `role=${parsed.data.role}`);
-    await base("Users").update(parsed.data.id, { Role: parsed.data.role });
+    await base("Users").update(parsed.data.id, { Role: roleLabel(parsed.data.role) });
     revalidatePath("/admin");
     revalidatePath("/staff");
     return { success: true };
@@ -247,7 +247,7 @@ export async function createAccount(_prev: AdminState, formData: FormData): Prom
         Email: parsed.data.email,
         Name: parsed.data.name,
         PasswordHash: await bcrypt.hash(temp, 12),
-        Role: parsed.data.role,
+        Role: roleLabel(parsed.data.role),
     });
 
     await sendEmail(

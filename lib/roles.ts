@@ -15,3 +15,8 @@ export function isStaff(role: string | undefined): boolean {
 export function isAdmin(role: string | undefined): boolean {
     return normalizeRole(role) === "admin";
 }
+
+export function roleLabel(role: string) {
+    const value = role.trim().toLowerCase();
+    return value.charAt(0).toUpperCase() + value.slice(1);
+}

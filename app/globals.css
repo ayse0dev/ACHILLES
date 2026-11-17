@@ -249,3 +249,66 @@ body {
 @media (prefers-reduced-motion: reduce) {
   .animate-wave, .animate-wave-reverse, .animate-sway { animation: none; }
 }
+
+@keyframes cross {
+  from { transform: translateX(-25vw); }
+  to { transform: translateX(110vw); }
+}
+@keyframes cross-rev {
+  from { transform: translateX(110vw); }
+  to { transform: translateX(-25vw); }
+}
+@keyframes bob {
+  0%, 100% { transform: translateY(0) rotate(-2deg); }
+  50% { transform: translateY(-7px) rotate(2deg); }
+}
+@keyframes glide {
+  0%, 100% { transform: translateY(0) rotate(-1deg); }
+  50% { transform: translateY(-12px) rotate(1.5deg); }
+}
+.animate-cross { animation: cross 60s linear infinite; }
+.animate-cross-rev { animation: cross-rev 60s linear infinite; }
+.animate-bob { animation: bob 3.2s ease-in-out infinite; }
+.animate-glide { animation: glide 5s ease-in-out infinite; }
+
+@media (prefers-reduced-motion: reduce) {
+  .animate-cross, .animate-cross-rev { animation: none; transform: translateX(30vw); }
+  .animate-bob, .animate-glide { animation: none; }
+}
+
+@keyframes akilo-wave {
+  0%, 100% { transform: rotate(-8deg); }
+  50% { transform: rotate(28deg); }
+}
+@keyframes akilo-peek {
+  0%, 80%, 100% { transform: translateX(46%); }
+  88%, 94% { transform: translateX(34%); }
+}
+@keyframes akilo-blink {
+  0%, 92%, 100% { transform: scaleY(1); }
+  96% { transform: scaleY(0.1); }
+}
+.akilo-body { transform: translateX(46%); animation: akilo-peek 7s ease-in-out infinite; transition: transform 0.5s ease-out; }
+.group:hover .akilo-body, .group:focus-within .akilo-body, .akilo-out { transform: translateX(0); animation: none; }
+.akilo-arm { transform-box: view-box; }
+.group:hover .akilo-arm, .group:focus-within .akilo-arm { animation: akilo-wave 0.7s ease-in-out infinite; }
+.akilo-pupils { transform-box: fill-box; transform-origin: center; animation: akilo-blink 5s infinite; }
+
+@media (prefers-reduced-motion: reduce) {
+  .akilo-body { animation: none; }
+  .akilo-pupils, .group:hover .akilo-arm, .group:focus-within .akilo-arm { animation: none; }
+}
+
+@keyframes ride-bob {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-1.5px); }
+}
+@keyframes ride-spin {
+  to { transform: rotate(360deg); }
+}
+.ride-bob { animation: ride-bob 0.5s ease-in-out infinite; }
+.ride-wheel { transform-box: view-box; animation: ride-spin 0.8s linear infinite; }
+
+@media (prefers-reduced-motion: reduce) {
+  .ride-bob, .ride-wheel { animation: none; }
+}

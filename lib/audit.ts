@@ -2,7 +2,7 @@ import { base } from "./airtable";
 
 export async function audit(actor: string, action: string, target = "", detail = "") {
     try {
-        await base("AuditLog").create({
+        await base("AuditLogs").create({
             Actor: actor,
             Action: action,
             Target: target,

@@ -12,6 +12,7 @@ import MoneyFlow from "@/components/MoneyFlow";
 import TrendChart from "@/components/TrendChart";
 import AutoRefresh from "@/components/AutoRefresh";
 import AttendanceClock from "@/components/AttendanceClock";
+import LiveInbox from "@/components/LiveInbox";
 import { buildBuyers, buildDays } from "@/lib/analytics";
 import { maskEmail } from "@/lib/audit";
 
@@ -22,6 +23,7 @@ const staffTabs = [
     { key: "deliveries", label: "Deliveries" },
     { key: "stock", label: "Stock" },
     { key: "tickets", label: "Tickets" },
+    { key: "chats", label: "Live chat" },
 ];
 
 function fmtDate(value?: string) {
@@ -232,7 +234,7 @@ export default async function DashboardView({ mode, tab = "overview" }: { mode: 
                 <section className="space-y-4">
                     {orderRecords.length === 0 && <p className="text-ink/60">No orders yet.</p>}
                     {orderRecords.map((o) => {
-                        const f = o.fields as { Email?: string; Items?: string; Total?: number; Status?: string; Tracking?: string; CreatedAt?: string };
+                        const f = o.fields as { Email?: string; Items?: string; Total?: number; Status?: string; Tracking?: string; CreatedAt?: string; Address?: string; Phone?: string; PaymentMethod?: string; Voucher?: string; Lat?: number; Lng?: number };
                         return (
                             <AdminOrderRow
                                 key={`${o.id}-${f.Status}-${f.Tracking ?? ""}`}
@@ -243,6 +245,12 @@ export default async function DashboardView({ mode, tab = "overview" }: { mode: 
                                 status={f.Status ?? "Paid"}
                                 tracking={f.Tracking ?? ""}
                                 created={fmtDate(f.CreatedAt)}
+                                address={f.Address}
+                                phone={f.Phone}
+                                payment={f.PaymentMethod}
+                                voucher={f.Voucher}
+                                lat={f.Lat}
+                                lng={f.Lng}
                             />
                         );
                     })}
@@ -254,7 +262,7 @@ export default async function DashboardView({ mode, tab = "overview" }: { mode: 
                     <p className="text-sm text-ink/70">Orders that are packed, shipped or delivered. Add the tracking number when it ships.</p>
                     {deliveries.length === 0 && <p className="text-ink/60">No deliveries yet.</p>}
                     {deliveries.map((o) => {
-                        const f = o.fields as { Email?: string; Items?: string; Total?: number; Status?: string; Tracking?: string; CreatedAt?: string };
+                        const f = o.fields as { Email?: string; Items?: string; Total?: number; Status?: string; Tracking?: string; CreatedAt?: string; Address?: string; Phone?: string; PaymentMethod?: string; Voucher?: string; Lat?: number; Lng?: number };
                         return (
                             <AdminOrderRow
                                 key={`${o.id}-${f.Status}-${f.Tracking ?? ""}`}
@@ -265,6 +273,12 @@ export default async function DashboardView({ mode, tab = "overview" }: { mode: 
                                 status={f.Status ?? "Packed"}
                                 tracking={f.Tracking ?? ""}
                                 created={fmtDate(f.CreatedAt)}
+                                address={f.Address}
+                                phone={f.Phone}
+                                payment={f.PaymentMethod}
+                                voucher={f.Voucher}
+                                lat={f.Lat}
+                                lng={f.Lng}
                             />
                         );
                     })}
@@ -308,6 +322,8 @@ export default async function DashboardView({ mode, tab = "overview" }: { mode: 
                     </div>
                 </section>
             )}
+
+            {activeTab === "chats" && <LiveInbox />}
 
             {activeTab === "tickets" && (
                 <section className="space-y-4">

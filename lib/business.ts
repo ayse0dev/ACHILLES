@@ -138,3 +138,9 @@ export const shoppingPolicies = [
     { title: "Warranty", text: "Manufacturer defects per brand. Wear and tear excluded." },
     { title: "Reservation", text: "24-hour hold via message" },
 ];
+
+export const shopBank = {
+    bank: "",
+    accountName: "",
+    accountNumber: "",
+};

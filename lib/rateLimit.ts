@@ -29,3 +29,21 @@ export async function allow(scope: string, limit: number, windowSec: number, ext
 }
 
 export const TOO_MANY = "Too many attempts. Please wait a few minutes and try again.";
+
+export function recordFailure(key: string) {
+    const list = buckets.get(`fail:${key}`) ?? [];
+    list.push(Date.now());
+    buckets.set(`fail:${key}`, list);
+}
+
+export function clearFailures(key: string) {
+    buckets.delete(`fail:${key}`);
+}
+
+export function blockedMinutes(key: string, limit: number, windowMs: number): number {
+    const now = Date.now();
+    const recent = (buckets.get(`fail:${key}`) ?? []).filter((t) => now - t < windowMs);
+    buckets.set(`fail:${key}`, recent);
+    if (recent.length < limit) return 0;
+    return Math.max(1, Math.ceil((recent[0] + windowMs - now) / 60000));
+}

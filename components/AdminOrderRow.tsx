@@ -4,7 +4,7 @@ import { useActionState } from "react";
 import { updateOrder, AdminState } from "@/app/admin/actions";
 
 const initial: AdminState = {};
-const STATUSES = ["Paid", "Packed", "Shipped", "Delivered"];
+const STATUSES = ["Pending payment", "Paid", "Confirmed", "Packed", "Shipped", "Delivered", "Cancelled"];
 
 export default function AdminOrderRow({
     id,
@@ -14,6 +14,12 @@ export default function AdminOrderRow({
     status,
     tracking,
     created,
+    address = "",
+    phone = "",
+    payment = "",
+    voucher = "",
+    lat,
+    lng,
 }: {
     id: string;
     email: string;
@@ -22,6 +28,12 @@ export default function AdminOrderRow({
     status: string;
     tracking: string;
     created: string;
+    address?: string;
+    phone?: string;
+    payment?: string;
+    voucher?: string;
+    lat?: number;
+    lng?: number;
 }) {
     const [state, formAction, isPending] = useActionState(updateOrder, initial);
 
@@ -31,7 +43,12 @@ export default function AdminOrderRow({
             <div className="space-y-1">
                 <p className="text-sm font-bold">{email}</p>
                 <p className="text-sm">{items}</p>
-                <p className="text-xs text-ink/60">{created} · ₱{total.toFixed(2)}</p>
+                <p className="text-xs text-ink/60">{created} · ₱{total.toFixed(2)}{payment ? ` · ${payment.replace("_", " ")}` : ""}{voucher ? ` · voucher ${voucher}` : ""}</p>
+                {address && <p className="text-xs">Deliver to: {address}</p>}
+                {phone && <p className="text-xs">Contact: {phone}</p>}
+                {lat !== undefined && lng !== undefined && (
+                    <a href={`https://www.openstreetmap.org/?mlat=${lat}&mlon=${lng}#map=17/${lat}/${lng}`} target="_blank" rel="noreferrer" className="text-xs underline">View pin on map</a>
+                )}
             </div>
             <div className="space-y-2">
                 <select name="status" defaultValue={status} className="field !py-2">

@@ -3,6 +3,7 @@ import { getFeaturedProducts } from "@/lib/products";
 import { base } from "@/lib/airtable";
 import ProductCard from "@/components/ProductCard";
 import HomeTabs from "@/components/HomeTabs";
+import CardDeck from "@/components/CardDeck";
 import { DoodleField } from "@/components/Doodles";
 import { contact, trustPoints, shopCategories } from "@/lib/business";
 
@@ -12,7 +13,7 @@ const features = [
     { href: "/shop", title: "Shoes", text: "Browse and filter the collection." },
     { href: "/repair", title: "Repairs", text: "Soles, heels, stitching and more." },
     { href: "/book", title: "Book a drop-off", text: "Choose a time that suits you." },
-    { href: "/track", title: "Track", text: "See your repair status by email." },
+    { href: "/track", title: "Track", text: "Follow a repair, order or ticket with its reference number." },
     { href: "/wishlist", title: "Wishlist", text: "Save the pairs you want next." },
     { href: "/reviews", title: "Reviews", text: "Read what customers say about their repairs." },
 ];
@@ -186,19 +187,7 @@ export default async function HomePage() {
             <section className="max-w-7xl mx-auto px-4 md:px-6 py-20">
                 <p className="eyebrow mb-3">Everything in one place</p>
                 <h2 className="uppercase font-black text-3xl md:text-5xl tracking-tight mb-10">Your shoes, your way</h2>
-                <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-5">
-                    {features.map((f, i) => (
-                        <Link
-                            key={f.href}
-                            href={f.href}
-                            className="card p-7 hover:-translate-y-1 transition duration-300 border-t-4"
-                            style={{ borderColor: ["#19b3c4", "#8b3fc7", "#ff7a3d", "#ffc83d", "#e8374f", "#19b3c4"][i] }}
-                        >
-                            <h3 className="uppercase font-black text-xl mb-2">{f.title}</h3>
-                            <p className="text-ink/70">{f.text}</p>
-                        </Link>
-                    ))}
-                </div>
+                <CardDeck items={features} />
             </section>
 
             <section className="max-w-7xl mx-auto px-4 md:px-6 pb-20">

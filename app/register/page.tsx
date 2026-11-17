@@ -2,22 +2,14 @@
 
 import Honeypot from "@/components/Honeypot";
 import { useActionState } from "react";
-import { useRouter } from "next/navigation";
-import { signIn } from "next-auth/react";
+import Link from "next/link";
 import { registerUser, RegisterState } from "./actions";
-import { useEffect } from "react";
+import VerifyCountdown from "@/components/VerifyCountdown";
 
 const initial: RegisterState = {};
 
 export default function RegisterPage() {
     const [state, formAction, isPending] = useActionState(registerUser, initial);
-    const router = useRouter();
-
-    useEffect(() => {
-        if (state.success) {
-            router.push("/login");
-        }
-    }, [state.success, router]);
 
     return (
         <div className="max-w-md mx-auto px-4 py-12">
@@ -26,9 +18,18 @@ export default function RegisterPage() {
                     <p className="eyebrow mb-1">Join ACHILLES</p>
                     <h1 className="page-title !text-3xl">Create account</h1>
                 </div>
+                {state.success ? (
+                    <div className="text-center space-y-3 py-4">
+                        <p className="font-black uppercase text-xl">Check your email</p>
+                        <p className="text-ink/70">We sent a verification link to {state.email}. Click the button in that email to activate your account, then log in.</p>
+                        <VerifyCountdown email={state.email ?? ""} seconds={state.expiresIn ?? 300} />
+                        <Link href="/login" className="btn btn-ink">Go to log in</Link>
+                    </div>
+                ) : (
                 <form action={formAction} className="space-y-3">
 <Honeypot />
                     <input name="name" placeholder="Full name" required className="field" />
+                    <input name="username" placeholder="Username (for quick log in)" required minLength={3} maxLength={20} autoComplete="username" className="field" />
                     <input name="email" type="email" placeholder="Email" required className="field" />
                     <input
                         name="password"
@@ -46,12 +47,10 @@ export default function RegisterPage() {
                         {isPending ? "Creating..." : "Register"}
                     </button>
                 </form>
-                <button
-                    onClick={() => signIn("credentials", { email: "", password: "" })}
-                    className="text-sm underline w-full text-center"
-                >
+                )}
+                <Link href="/login" className="block text-sm underline w-full text-center">
                     Already have an account? Log in
-                </button>
+                </Link>
             </div>
         </div>
     );

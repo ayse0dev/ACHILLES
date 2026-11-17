@@ -37,6 +37,7 @@ export async function sendOtpEmail(email: string, code: string) {
     await sendEmail(
         email,
         "Your ACHILLES login code",
-        `Your login verification code is ${code}. It expires in 5 minutes.`
+        "Use this code to finish logging in to your ACHILLES account. It expires in 5 minutes. If you did not try to log in, you can ignore this email and consider changing your password.",
+        { heading: "Your login code", code }
     );
 }

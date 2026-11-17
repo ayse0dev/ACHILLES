@@ -1,6 +1,5 @@
 import Link from "next/link";
-import ProgressLine from "@/components/ProgressLine";
-import { orderSteps } from "@/lib/reference";
+import DeliveryProgress from "@/components/DeliveryProgress";
 import { base } from "@/lib/airtable";
 import { formulaString } from "@/lib/formula";
 import { getCurrentUser } from "@/lib/session";
@@ -8,9 +7,9 @@ import { getCurrentUser } from "@/lib/session";
 export default async function OrdersPage({
     searchParams,
 }: {
-    searchParams: Promise<{ paid?: string }>;
+    searchParams: Promise<{ paid?: string; placed?: string }>;
 }) {
-    const { paid } = await searchParams;
+    const { paid, placed } = await searchParams;
     const user = await getCurrentUser();
 
     if (!user) {
@@ -38,6 +37,10 @@ export default async function OrdersPage({
                 <h1 className="page-title">Your orders</h1>
             </div>
 
+            {placed && (
+                <p className="card p-4 text-sm font-bold">Order {placed.slice(0, 12)} placed! We will keep you posted by email and notifications.</p>
+            )}
+
             {paid && (
                 <p className="card p-4 text-sm font-bold">Thanks! Your payment went through. It can take a moment to appear here.</p>
             )}
@@ -47,7 +50,7 @@ export default async function OrdersPage({
             ) : (
                 <ul className="space-y-4">
                     {records.map((r) => {
-                        const f = r.fields as { Reference?: string; Items?: string; Total?: number; Status?: string; CreatedAt?: string };
+                        const f = r.fields as { Reference?: string; Items?: string; Total?: number; Status?: string; CreatedAt?: string; Address?: string; PaymentMethod?: string };
                         return (
                             <li key={r.id} className="card p-5 space-y-2">
                                 <div className="flex justify-between gap-4">
@@ -58,7 +61,8 @@ export default async function OrdersPage({
                                 </div>
                                 {f.Reference && <p className="text-xs font-bold tracking-widest">{f.Reference}</p>}
                                 <p className="text-sm">{f.Items}</p>
-                                <ProgressLine steps={orderSteps} current={f.Status ?? "Paid"} />
+                                {f.Address && <p className="text-xs text-ink/60">Deliver to: {f.Address}</p>}
+                                <DeliveryProgress status={f.Status ?? "Paid"} />
                                 {f.Status === "Delivered" && f.Reference && (
                                     <Link href={`/reviews?ref=${f.Reference}`} className="underline font-bold text-sm">Review this order</Link>
                                 )}

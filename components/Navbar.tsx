@@ -60,26 +60,7 @@ export default function Navbar() {
                 </ul>
 
                 <div className="flex items-center gap-3 text-sm shrink-0">
-                    {status !== "loading" &&
-                        (session?.user ? (
-                            <>
-                                {!isAdminUser && <NotificationBell />}
-                                <AccountMenu
-                                    name={session.user.name ?? ""}
-                                    email={session.user.email ?? ""}
-                                    role={role || "customer"}
-                                />
-                            </>
-                        ) : (
-                            <>
-                                <Link href="/login" className="hidden sm:inline underline font-bold">
-                                    Log in
-                                </Link>
-                                <Link href="/register" className="hidden sm:inline-flex btn btn-ink !py-2 !px-4 text-xs uppercase">
-                                    Join
-                                </Link>
-                            </>
-                        ))}
+                    {status !== "loading" && session?.user && !isAdminUser && <NotificationBell />}
                     {!isAdminUser && (
                         <Link
                             href="/cart"
@@ -94,6 +75,23 @@ export default function Navbar() {
                             )}
                         </Link>
                     )}
+                    {status !== "loading" &&
+                        (session?.user ? (
+                            <AccountMenu
+                                name={session.user.name ?? ""}
+                                email={session.user.email ?? ""}
+                                role={role || "customer"}
+                            />
+                        ) : (
+                            <>
+                                <Link href="/login" className="hidden sm:inline underline font-bold">
+                                    Log in
+                                </Link>
+                                <Link href="/register" className="hidden sm:inline-flex btn btn-ink !py-2 !px-4 text-xs uppercase">
+                                    Join
+                                </Link>
+                            </>
+                        ))}
                 </div>
             </nav>
 

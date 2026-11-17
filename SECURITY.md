@@ -10,7 +10,7 @@ ACHILLES is a Next.js app with Airtable as the database, PayMongo for payments, 
 - The site now sends strict browser security headers, forces HTTPS in production, and limits how fast anyone can try logins, forms, checkout and the chat.
 - Logins already need a password plus an emailed code. Admin and staff sessions now end after 8 hours, or after 30 minutes of no activity.
 - Spam bots are caught by a hidden field. Customers must agree to the Privacy Policy before registering or booking a repair.
-- Staff actions (repair, order, stock, ticket and role changes, plus logins and failed logins) are written to an `AuditLog` table. Staff see masked customer emails; only admins see full ones.
+- Staff actions (repair, order, stock, ticket and role changes, plus logins and failed logins) are written to an `AuditLogs` table. Staff see masked customer emails; only admins see full ones.
 - Card details never touch your server. PayMongo hosts the payment page and the webhook is signature-checked.
 - Things only you can do: put the site behind Cloudflare, use a host with backups, turn on 2FA on every account (Airtable, PayMongo, Brevo, domain, GitHub), set up SPF/DKIM/DMARC on your own domain, and rotate the Brevo key that appeared in a screenshot.
 
@@ -78,7 +78,7 @@ ACHILLES is a Next.js app with Airtable as the database, PayMongo for payments, 
 
 | Item | Status | Priority | Notes |
 |---|---|---|---|
-| Security logging | Done | High | `AuditLog` table: login success and failure, repair, order, stock, ticket and role changes. |
+| Security logging | Done | High | `AuditLogs` table: login success and failure, repair, order, stock, ticket and role changes. |
 | Uptime and alerts | Planned | High | UptimeRobot free plan, 5-minute checks. |
 | Vulnerability and malware scans | Planned | Medium | GitHub Dependabot and `npm audit` (free). Optional paid scanner: Snyk free tier. |
 | Incident response plan | Planned | High | Write one page: who is called, how to rotate keys, how to restore, and how to notify customers and the National Privacy Commission (within 72 hours of a confirmed breach). |
@@ -103,7 +103,7 @@ ACHILLES is a Next.js app with Airtable as the database, PayMongo for payments, 
 
 ## Airtable tables to add
 
-- `AuditLog`: `Actor`, `Action`, `Target`, `Detail` (text), `CreatedAt` (text or date).
+- `AuditLogs`: `Actor`, `Action`, `Target`, `Detail` (text), `CreatedAt` (text or date).
 
 ## Known issues
 

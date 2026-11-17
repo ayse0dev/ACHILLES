@@ -1,56 +1,83 @@
 "use server";
 
 import bcrypt from "bcryptjs";
+import { headers } from "next/headers";
 import { z } from "zod";
-import { findUserByEmail } from "@/lib/users";
+import { findUserByIdentifier } from "@/lib/users";
 import { generateOTP, sendOtpEmail } from "@/lib/otp";
-import { allow, hit, TOO_MANY } from "@/lib/rateLimit";
+import { blockedMinutes, clearFailures, ipFrom, recordFailure } from "@/lib/rateLimit";
 import { audit } from "@/lib/audit";
+import { resendVerification } from "@/lib/verify";
 
 const schema = z.object({
-    email: z.string().email(),
+    identifier: z.string().trim().min(2).max(120),
     password: z.string().min(1),
 });
 
-export type RequestCodeState = { error?: string; codeSent?: boolean };
+export type RequestCodeState = { error?: string; codeSent?: boolean; sentTo?: string };
+
+const MAX_PER_ACCOUNT = 5;
+const MAX_PER_IP = 20;
+const WINDOW_MS = 15 * 60 * 1000;
+
+function maskEmail(email: string) {
+    const [user, domain] = email.split("@");
+    return `${user.slice(0, 2)}${"*".repeat(Math.max(1, user.length - 2))}@${domain}`;
+}
 
 export async function requestLoginCode(
     _prev: RequestCodeState,
     formData: FormData
 ): Promise<RequestCodeState> {
     const parsed = schema.safeParse({
-        email: formData.get("email"),
+        identifier: formData.get("identifier"),
         password: formData.get("password"),
     });
     if (!parsed.success) {
-        return { error: "Enter a valid email and password." };
+        return { error: "Enter your email or username and your password." };
     }
 
-    if (!(await allow("login", 15, 900))) return { error: TOO_MANY };
-    if (!hit(`login-email:${parsed.data.email.toLowerCase()}`, 6, 900000)) return { error: TOO_MANY };
+    const ip = ipFrom(await headers());
+    const accountKey = `acct:${parsed.data.identifier.toLowerCase()}`;
+    const ipKey = `ip:${ip}`;
 
-    const record = await findUserByEmail(parsed.data.email);
-    const hash = (record?.fields as { PasswordHash?: string } | undefined)?.PasswordHash;
-    if (!record || !hash) {
-        return { error: "Invalid email or password." };
+    const wait = Math.max(blockedMinutes(accountKey, MAX_PER_ACCOUNT, WINDOW_MS), blockedMinutes(ipKey, MAX_PER_IP, WINDOW_MS));
+    if (wait > 0) {
+        return { error: `Too many wrong attempts. Please try again in ${wait} minute${wait === 1 ? "" : "s"}.` };
     }
 
-    const passwordOk = await bcrypt.compare(parsed.data.password, hash);
-    if (!passwordOk) {
-        await audit(parsed.data.email, "login_failed", "password");
-        return { error: "Invalid email or password." };
+    const fail = async () => {
+        recordFailure(accountKey);
+        recordFailure(ipKey);
+        await audit(parsed.data.identifier, "login_failed", "password");
+        return { error: "Invalid email, username or password." };
+    };
+
+    const record = await findUserByIdentifier(parsed.data.identifier);
+    const profile = record?.fields as { Email?: string; Name?: string; PasswordHash?: string; VerifyToken?: string } | undefined;
+    if (!record || !profile?.PasswordHash || !profile.Email) return fail();
+
+    if (!(await bcrypt.compare(parsed.data.password, profile.PasswordHash))) return fail();
+
+    clearFailures(accountKey);
+
+    if (profile.VerifyToken) {
+        try {
+            await resendVerification(record.id, profile.Email, profile.Name ?? "there");
+        } catch {
+            return { error: "Please verify your email first. We could not send a new link, try again shortly." };
+        }
+        return { error: "Please verify your email first. We just sent you a new verification link." };
     }
 
-    const code = await generateOTP(parsed.data.email);
-    if (!code) {
-        return { error: "Invalid email or password." };
-    }
+    const code = await generateOTP(profile.Email);
+    if (!code) return fail();
 
     try {
-        await sendOtpEmail(parsed.data.email, code);
+        await sendOtpEmail(profile.Email, code);
     } catch {
         return { error: "We couldn't send the code email. Please try again." };
     }
 
-    return { codeSent: true };
+    return { codeSent: true, sentTo: maskEmail(profile.Email) };
 }

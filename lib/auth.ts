@@ -3,10 +3,10 @@ import GoogleProvider from "next-auth/providers/google";
 import FacebookProvider from "next-auth/providers/facebook";
 import CredentialsProvider from "next-auth/providers/credentials";
 import bcrypt from "bcryptjs";
-import { findUserByEmail } from "./users";
+import { findUserByIdentifier } from "./users";
 import { normalizeRole } from "./roles";
 import { verifyOTP } from "@/lib/otp";
-import { hit } from "@/lib/rateLimit";
+import { blockedMinutes, clearFailures, recordFailure } from "@/lib/rateLimit";
 import { audit } from "@/lib/audit";
 
 export const authOptions: NextAuthOptions = {
@@ -36,9 +36,10 @@ export const authOptions: NextAuthOptions = {
             },
             async authorize(credentials) {
                 if (!credentials?.email) return null;
-                if (!hit(`authorize:${credentials.email.toLowerCase()}`, 8, 900000)) return null;
+                const failKey = `acct:${credentials.email.trim().toLowerCase()}`;
+                if (blockedMinutes(failKey, 5, 900000) > 0) return null;
 
-                const record = await findUserByEmail(credentials.email);
+                const record = await findUserByIdentifier(credentials.email);
                 if (!record) return null;
 
                 const user = record.fields as {
@@ -46,6 +47,7 @@ export const authOptions: NextAuthOptions = {
                     Name?: string;
                     PasswordHash?: string;
                     Role?: string;
+                    VerifyToken?: string;
                 };
                 const sessionUser = {
                     id: record.id,
@@ -55,15 +57,21 @@ export const authOptions: NextAuthOptions = {
                 };
 
                 if (!credentials.password || !credentials.otp || !user.PasswordHash) return null;
+                if (user.VerifyToken) return null;
 
-                const validOtp = await verifyOTP(credentials.email, credentials.otp);
+                const validOtp = await verifyOTP(user.Email, credentials.otp);
                 if (!validOtp) {
-                    await audit(credentials.email, "login_failed", "otp");
+                    recordFailure(failKey);
+                    await audit(user.Email, "login_failed", "otp");
                     return null;
                 }
 
                 const valid = await bcrypt.compare(credentials.password, user.PasswordHash);
-                if (valid) await audit(sessionUser.email, "login_success", sessionUser.role);
+                if (!valid) recordFailure(failKey);
+                if (valid) {
+                    clearFailures(failKey);
+                    await audit(sessionUser.email, "login_success", sessionUser.role);
+                }
                 return valid ? sessionUser : null;
             },
         }),

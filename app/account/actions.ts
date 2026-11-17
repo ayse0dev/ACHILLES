@@ -4,6 +4,7 @@ import bcrypt from "bcryptjs";
 import { z } from "zod";
 import { base } from "@/lib/airtable";
 import { getCurrentUser } from "@/lib/session";
+import { findUserByUsername, normalizeUsername } from "@/lib/users";
 
 export type AccountState = { error?: string; success?: boolean };
 
@@ -11,10 +12,19 @@ export async function updateProfile(_prev: AccountState, formData: FormData): Pr
     const user = await getCurrentUser();
     if (!user) return { error: "Log in first." };
 
-    const parsed = z.object({ name: z.string().trim().min(2).max(80) }).safeParse({ name: formData.get("name") });
-    if (!parsed.success) return { error: "Enter a name with at least 2 characters." };
+    const parsed = z
+        .object({
+            name: z.string().trim().min(2).max(80),
+            username: z.string().trim().toLowerCase().regex(/^[a-z0-9_.]{3,20}$/),
+        })
+        .safeParse({ name: formData.get("name"), username: formData.get("username") });
+    if (!parsed.success) return { error: "Enter a name, and a username of 3 to 20 letters, numbers, dots or underscores." };
 
-    await base("Users").update(user.id, { Name: parsed.data.name });
+    const username = normalizeUsername(parsed.data.username);
+    const taken = await findUserByUsername(username);
+    if (taken && taken.id !== user.id) return { error: "That username is taken. Please choose another." };
+
+    await base("Users").update(user.id, { Name: parsed.data.name, Username: username });
     return { success: true };
 }
 

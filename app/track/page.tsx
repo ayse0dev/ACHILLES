@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { useActionState } from "react";
 import ProgressLine from "@/components/ProgressLine";
+import DeliveryProgress from "@/components/DeliveryProgress";
 import { lookupReference, TrackState } from "./actions";
 
 const initial: TrackState = {};
@@ -53,7 +54,7 @@ export default function TrackPage() {
                         </div>
                         <span className="text-xs font-bold px-3 py-1 rounded-full bg-teal/25">{r.status}</span>
                     </div>
-                    <ProgressLine steps={r.steps} current={r.status} />
+                    {r.kind === "Order" ? <DeliveryProgress status={r.status} /> : <ProgressLine steps={r.steps} current={r.status} />}
                     {r.note && <p className="text-sm font-bold">{r.note}</p>}
                     {r.kind !== "Ticket" && ["Completed", "Delivered"].includes(r.status) && (
                         <Link href={`/reviews?ref=${r.reference}`} className="btn btn-accent">

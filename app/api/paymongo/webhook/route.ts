@@ -39,6 +39,30 @@ export async function POST(request: Request) {
     }
 
     const session = await getCheckoutSession(sessionId);
+
+    const orderId = session.metadata.orderId;
+    if (orderId) {
+        const order = await base("Orders").find(orderId).catch(() => null);
+        if (!order) return NextResponse.json({ received: true });
+        const f = order.fields as { Reference?: string; Email?: string; Items?: string; Total?: number; Status?: string };
+        if (f.Status && f.Status !== "Pending payment") return NextResponse.json({ received: true });
+        await base("Orders").update(orderId, { Status: "Paid", PaymentRef: sessionId });
+        const to = f.Email || session.email;
+        await sendEmail(
+            to,
+            "Your ACHILLES order is confirmed",
+            `Thanks for your order!
+
+Reference: ${f.Reference}
+Items: ${f.Items}
+Total: ₱${(f.Total ?? session.total).toFixed(2)}
+
+You can follow your delivery on the Orders page.`
+        );
+        await notify(to, "Payment received", `Reference ${f.Reference}. Total ₱${(f.Total ?? session.total).toFixed(2)}.`, "/orders");
+        return NextResponse.json({ received: true });
+    }
+
     const reference = newReference("OR");
 
     await base("Orders").create({
