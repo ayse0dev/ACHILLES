@@ -1,7 +1,7 @@
 "use client";
 
 import "leaflet/dist/leaflet.css";
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef } from "react";
 import type { Map as LeafletMap, CircleMarker } from "leaflet";
 
 type Point = { lat: number; lng: number } | null;
@@ -12,19 +12,39 @@ export default function MapPin({ value, onChange }: { value: Point; onChange: (p
     const markerRef = useRef<CircleMarker | null>(null);
     const lastRef = useRef<Point>(value);
     const changeRef = useRef(onChange);
+    const valueRef = useRef<Point>(value);
 
     useEffect(() => {
         changeRef.current = onChange;
+        valueRef.current = value;
     });
-    const [locating, setLocating] = useState(false);
-    const [note, setNote] = useState("");
+
+    useEffect(() => {
+        const map = mapRef.current;
+        if (!map || !value) return;
+        const last = lastRef.current;
+        if (last && Math.abs(last.lat - value.lat) < 1e-7 && Math.abs(last.lng - value.lng) < 1e-7) return;
+        lastRef.current = value;
+        import("leaflet").then((L) => {
+            if (markerRef.current) markerRef.current.setLatLng([value.lat, value.lng]);
+            else
+                markerRef.current = L.circleMarker([value.lat, value.lng], {
+                    radius: 10,
+                    color: "#1b1340",
+                    weight: 3,
+                    fillColor: "#ff7a3d",
+                    fillOpacity: 1,
+                }).addTo(map);
+            map.setView([value.lat, value.lng], 17);
+        });
+    }, [value]);
 
     useEffect(() => {
         let cancelled = false;
         (async () => {
             const L = await import("leaflet");
             if (cancelled || !el.current || mapRef.current) return;
-            const start = lastRef.current;
+            const start = valueRef.current;
             const map = L.map(el.current, { scrollWheelZoom: false }).setView(start ? [start.lat, start.lng] : [12.88, 121.77], start ? 16 : 5);
             L.tileLayer("https://tile.openstreetmap.org/{z}/{x}/{y}.png", {
                 maxZoom: 19,
@@ -57,52 +77,10 @@ export default function MapPin({ value, onChange }: { value: Point; onChange: (p
         };
     }, []);
 
-    const locate = () => {
-        if (!navigator.geolocation) {
-            setNote("Your browser cannot share location. Tap the map instead.");
-            return;
-        }
-        setLocating(true);
-        setNote("");
-        navigator.geolocation.getCurrentPosition(
-            async (pos) => {
-                const { latitude, longitude } = pos.coords;
-                const L = await import("leaflet");
-                const map = mapRef.current;
-                if (map) {
-                    map.setView([latitude, longitude], 17);
-                    if (markerRef.current) markerRef.current.setLatLng([latitude, longitude]);
-                    else
-                        markerRef.current = L.circleMarker([latitude, longitude], {
-                            radius: 10,
-                            color: "#1b1340",
-                            weight: 3,
-                            fillColor: "#ff7a3d",
-                            fillOpacity: 1,
-                        }).addTo(map);
-                }
-                lastRef.current = { lat: latitude, lng: longitude };
-                changeRef.current(lastRef.current);
-                setLocating(false);
-            },
-            () => {
-                setNote("Could not get your location. Tap the map to drop a pin.");
-                setLocating(false);
-            },
-            { enableHighAccuracy: true, timeout: 10000 }
-        );
-    };
-
     return (
         <div className="space-y-2">
             <div ref={el} className="h-56 w-full rounded-2xl border-2 border-ink overflow-hidden z-0" />
-            <div className="flex flex-wrap items-center gap-3 text-xs">
-                <button type="button" onClick={locate} disabled={locating} className="underline font-bold">
-                    {locating ? "Locating..." : "Use my current location"}
-                </button>
-                <span className="text-ink/60">{value ? `Pin set (${value.lat.toFixed(5)}, ${value.lng.toFixed(5)})` : "Tap the map to drop a pin (optional)."}</span>
-            </div>
-            {note && <p className="text-xs text-red">{note}</p>}
+            <p className="text-xs text-ink/60">{value ? `Pin set (${value.lat.toFixed(5)}, ${value.lng.toFixed(5)})` : "Tap the map to drop a pin (optional)."}</p>
         </div>
     );
 }

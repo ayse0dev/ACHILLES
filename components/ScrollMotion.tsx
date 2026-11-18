@@ -41,6 +41,7 @@ export default function ScrollMotion() {
                     if (!state) return;
                     if (entry.isIntersecting) {
                         if (!state.hold) return;
+                        if (entry.intersectionRatio < 0.15 && entry.intersectionRect.height < 100) return;
                         const show = entry.target.animate([HIDDEN, SHOWN], {
                             duration: 800,
                             delay: (state.index % 4) * 90,
@@ -56,7 +57,7 @@ export default function ScrollMotion() {
                     }
                 });
             },
-            { threshold: 0.15, rootMargin: "0px 0px -8% 0px" }
+            { threshold: [0, 0.01, 0.02, 0.04, 0.08, 0.15], rootMargin: "0px 0px -8% 0px" }
         );
 
         function collect() {

@@ -78,6 +78,7 @@ export default function Navbar() {
                     {status !== "loading" &&
                         (session?.user ? (
                             <AccountMenu
+                                userId={(session.user as { id?: string }).id ?? ""}
                                 name={session.user.name ?? ""}
                                 email={session.user.email ?? ""}
                                 role={role || "customer"}

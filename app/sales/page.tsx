@@ -1,5 +1,7 @@
 import Link from "next/link";
 import { offers, promoTerms, whyBuy } from "@/lib/business";
+import { getSaleProducts } from "@/lib/products";
+import ProductCard from "@/components/ProductCard";
 
 export const metadata = {
     title: "Sales & Offers – ACHILLES",
@@ -8,7 +10,10 @@ export const metadata = {
 
 const colors = ["#19b3c4", "#8b3fc7", "#ff7a3d", "#ffc83d", "#e8374f", "#19b3c4", "#8b3fc7", "#ff7a3d"];
 
-export default function SalesPage() {
+export const revalidate = 300;
+
+export default async function SalesPage() {
+    const onSale = await getSaleProducts(24);
     return (
         <div className="max-w-6xl mx-auto px-4 md:px-6 py-12 space-y-14">
             <div>
@@ -24,6 +29,17 @@ export default function SalesPage() {
                     </article>
                 ))}
             </section>
+
+            {onSale.length > 0 && (
+                <section className="space-y-6">
+                    <h2 className="uppercase font-black text-2xl tracking-tight">On sale now</h2>
+                    <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-5">
+                        {onSale.map((p) => (
+                            <ProductCard key={p.id} product={p} />
+                        ))}
+                    </div>
+                </section>
+            )}
 
             <section className="grid md:grid-cols-2 gap-6">
                 <div className="card p-6 md:p-8 space-y-3">

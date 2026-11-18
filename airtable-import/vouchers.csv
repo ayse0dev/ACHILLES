@@ -1,0 +1,3 @@
+Code,Type,Value,MinSpend,Active,ExpiresAt,UsesLeft
+WELCOME10,Percent,10,500,checked,2027-12-31,100
+PESO100,Fixed,100,1000,checked,2027-12-31,50

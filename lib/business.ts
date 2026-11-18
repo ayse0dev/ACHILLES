@@ -16,11 +16,11 @@ export const trustPoints = [
 ];
 
 export const shopCategories = [
-    { label: "Men", href: "/shop?category=Men", text: "Formal, casual, boots, sandals, sports" },
-    { label: "Women", href: "/shop?category=Women", text: "Heels, flats, sandals, boots, sneakers" },
-    { label: "Kids", href: "/shop?category=Kids", text: "School shoes, sneakers, sandals, sports" },
-    { label: "Sports", href: "/shop?category=Sports", text: "Running, basketball, football, training" },
-    { label: "Cleaning Equipment", href: "/shop?category=Cleaning", text: "Brushes, cleaners, polish and restoration tools" },
+    { label: "Men", href: "/shop?category=Men#products", text: "Formal, casual, boots, sandals, sports" },
+    { label: "Women", href: "/shop?category=Women#products", text: "Heels, flats, sandals, boots, sneakers" },
+    { label: "Kids", href: "/shop?category=Kids#products", text: "School shoes, sneakers, sandals, sports" },
+    { label: "Sports", href: "/shop?category=Sports#products", text: "Running, basketball, football, training" },
+    { label: "Cleaning Equipment", href: "/shop?category=Cleaning#products", text: "Brushes, cleaners, polish and restoration tools" },
     { label: "Sales & Offers", href: "/sales", text: "Clearance, bundles and discounts" },
 ];
 
@@ -113,6 +113,14 @@ export const offers = [
     { offer: "Loyalty card", details: "Buy 5 pairs, 6th at 20% off" },
     { offer: "Free polish", details: "With leather shoe purchase (in-store)" },
     { offer: "Repair + buy combo", details: "Buy shoes, get 15% off any repair" },
+    { offer: "Payday sale", details: "Extra 10% off every 15th and 30th of the month" },
+    { offer: "Free shipping", details: "On orders of ₱3,000 and above within Metro Manila" },
+    { offer: "Birthday treat", details: "Voucher for 10% off during your birthday month" },
+    { offer: "Cleaning kit bundle", details: "Brush, cleaner and polish together at 20% off" },
+    { offer: "Weekend flash deal", details: "New markdowns every Saturday and Sunday" },
+    { offer: "Refer a friend", details: "You both get a ₱100 voucher on the first order" },
+    { offer: "Kids back-to-school", details: "School shoes with a free cleaning and waterproofing" },
+    { offer: "Trade-in credit", details: "Bring an old pair for ₱200 off a new one" },
 ];
 
 export const promoTerms = [
@@ -143,4 +151,41 @@ export const shopBank = {
     bank: "",
     accountName: "",
     accountNumber: "",
+};
+
+export const serviceDetails: Record<string, string> = {
+    "Heel tip / top lift": "Replaces the small worn rubber tip at the back of the heel so you stop walking on bare heel.",
+    "Full heel replacement": "Removes the worn heel block and fits a new one, matched to height and shape.",
+    "Half sole": "A new sole is fitted on the front half of the shoe where wear is worst, saving the rest.",
+    "Full sole replacement": "Old sole is removed and a new full sole is glued and stitched on.",
+    "Re-stitching (per seam)": "Splitting seams are re-sewn by hand or machine with strong waxed thread.",
+    "Re-gluing": "Peeling soles and loose parts are cleaned and bonded back with shoe-grade cement.",
+    "Patch repair": "Tears and holes in leather or fabric are reinforced and covered with a matching patch.",
+    "Lining replacement": "Worn or torn inner lining is cut out and replaced for a smooth, fresh fit.",
+    "Insole replacement": "Flattened or smelly insoles are swapped for new cushioned ones.",
+    "Shoe stretching": "Tight shoes are gently widened or lengthened on a stretching machine.",
+    "Cleaning & conditioning": "Deep clean followed by conditioner so leather stays soft and does not crack.",
+    "Polish & shine": "Wax polish and a hand buff to bring back color and shine.",
+    "Scuff / scratch repair": "Scrapes are filled, sanded and colored so they blend into the leather.",
+    "Color restoration / re-dye": "Faded or stained leather is re-dyed to its original color or a new one.",
+    "Waterproofing": "A protective coating that repels rain and stains on leather, suede and canvas.",
+    "Zipper replacement": "Broken or stuck zippers are removed and replaced with a new matching one.",
+    "Eyelet replacement (each)": "Torn or missing lace holes are replaced with new metal eyelets.",
+    "Buckle / strap repair": "Broken straps and buckles are re-stitched or replaced.",
+    "Elastic gusset replacement": "Stretched-out side elastics on boots and loafers are swapped for new ones.",
+    "Toe taps / toe protectors": "Small caps on the toe stop scuffing and wear on the front edge.",
+    "Sole protectors": "A thin rubber layer glued on the sole for grip and longer life.",
+    "Metal toe plates": "Metal plates on the toe for extra durability on work and dress shoes.",
+    "Heel height adjustment": "Heels are cut down or built up so they sit at the height you want.",
+    "Shank repair / replacement": "Replaces the hidden support strip in the arch when your shoe feels floppy.",
+    "Boot resoling / rebuilding": "Full rebuild of the boot base with a new sole, welt work and heel stack.",
+    "Orthopedic modification": "Soles and insoles adjusted to fit medical support or leg-length needs.",
+    "Sneaker deep clean": "Hand wash of uppers, midsoles, laces and insoles, then air drying.",
+    "Sneaker restoration": "Yellowed soles, cracked paint and faded colors brought back close to new.",
+    "Athletic midsole replacement": "Crumbling or hardened midsole foam is replaced for cushioning again.",
+    "Dance shoe repair": "Heels, suede soles and straps for ballroom, Latin and dance shoes.",
+    "Handbag / leather goods repair": "Handles, straps, zippers, stitching and edges on bags, belts and wallets.",
+    "Suede / nubuck cleaning": "Dry and wet cleaning that lifts stains and restores the soft nap.",
+    "Full shoe restoration": "A complete overhaul: clean, re-dye, new sole, heels, lining and polish.",
+    "Vintage shoe repair": "Careful repair of old and delicate pairs. We inspect first and quote after.",
 };

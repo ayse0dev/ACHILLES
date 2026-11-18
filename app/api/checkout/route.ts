@@ -4,6 +4,7 @@ import { z } from "zod";
 import { base } from "@/lib/airtable";
 import { getCurrentUser } from "@/lib/session";
 import { getProductBySlug } from "@/lib/products";
+import { priceOf } from "@/lib/price";
 import { createCheckoutSession } from "@/lib/paymongo";
 import { addressFields, findOwnedAddress, listAddresses } from "@/lib/addresses";
 import { addressLine, addressSchema } from "@/lib/addressTypes";
@@ -71,7 +72,7 @@ export async function POST(request: Request) {
             return NextResponse.json({ error: `${product.name} is not available in size ${item.size}.` }, { status: 400 });
         }
         if (product.stock < item.qty) return NextResponse.json({ error: `Not enough stock for ${product.name}.` }, { status: 409 });
-        lines.push({ quantity: item.qty, amount: Math.round(product.price * 100 * idRate), name: `${product.name} (size ${item.size})` });
+        lines.push({ quantity: item.qty, amount: Math.round(priceOf(product) * 100 * idRate), name: `${product.name} (size ${item.size})` });
     }
 
     const subtotalCents = lines.reduce((s, l) => s + l.amount * l.quantity, 0);
@@ -109,6 +110,7 @@ export async function POST(request: Request) {
         Email: user.email,
         Name: user.name ?? "",
         Items: items,
+        Lines: JSON.stringify(lines.map((l) => ({ name: l.name, qty: l.quantity, unit: l.amount / 100 }))),
         Total: total,
         Status: status,
         Discount: data.discount === "none" ? "" : data.discount,
@@ -142,7 +144,7 @@ export async function POST(request: Request) {
         const session = await createCheckoutSession({
             lines,
             email: user.email,
-            successUrl: `${origin}/orders?paid=1`,
+            successUrl: `${origin}/orders/${reference}?paid=1`,
             cancelUrl: `${origin}/cart`,
             methods: [...METHODS[data.payment]],
             metadata: { email: user.email, orderId: record.id },

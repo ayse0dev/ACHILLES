@@ -8,6 +8,7 @@ import { notify } from "@/lib/notify";
 import { allow, TOO_MANY } from "@/lib/rateLimit";
 import { z } from "zod";
 import { newReference } from "@/lib/reference";
+import { repairGroups } from "@/lib/business";
 
 const schema = z.object({
     name: z.string().min(1),
@@ -16,6 +17,7 @@ const schema = z.object({
     shoeDescription: z.string().min(5),
     issue: z.string().min(5),
     photoUrl: z.string().url().optional().or(z.literal("")),
+    service: z.string().max(80).optional(),
 });
 
 export type RepairState = { error?: string; success?: boolean; reference?: string };
@@ -34,6 +36,7 @@ export async function submitRepair(
         shoeDescription: formData.get("shoeDescription"),
         issue: formData.get("issue"),
         photoUrl: formData.get("photoUrl") ?? "",
+        service: String(formData.get("service") ?? "") || undefined,
     });
 
     if (!parsed.success) {
@@ -43,6 +46,10 @@ export async function submitRepair(
     const session = await getServerSession(authOptions);
     const d = parsed.data;
 
+    const knownServices = repairGroups.flatMap((g) => g.rows.map((r) => r.service));
+    const service = d.service && knownServices.includes(d.service) ? d.service : "";
+    const issue = service ? `Service requested: ${service}\n${d.issue}` : d.issue;
+
     const reference = newReference("RP");
 
     await base("RepairRequests").create({
@@ -51,7 +58,7 @@ export async function submitRepair(
         Email: d.email,
         Phone: d.phone ?? "",
         ShoeDescription: d.shoeDescription,
-        Issue: d.issue,
+        Issue: issue,
         PhotoUrl: d.photoUrl || undefined,
         Status: "Pending",
         SubmittedAt: new Date().toISOString(),
@@ -61,7 +68,7 @@ export async function submitRepair(
     await sendEmail(
         d.email,
         "We received your ACHILLES repair request",
-        `Hi ${d.name},\n\nThanks for sending us your ${d.shoeDescription}. We'll email you a quote within 24 hours.\n\nYour reference number is ${reference}. Use it on the Track page to follow progress.`
+        `Hi ${d.name},\n\nThanks for sending us your ${d.shoeDescription}${service ? ` for ${service}` : ""}. We'll email you a quote within 24 hours.\n\nYour reference number is ${reference}. Use it on the Track page to follow progress.`
     );
 
     await notify(d.email, "Repair request received", `Reference ${reference}. We will send a quote within 24 hours.`, "/track");

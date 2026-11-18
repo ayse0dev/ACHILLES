@@ -212,7 +212,7 @@ export default async function DashboardView({ mode, tab = "overview" }: { mode: 
                 <section className="space-y-4">
                     {repairRecords.length === 0 && <p className="text-ink/60">No repair requests yet.</p>}
                     {repairRecords.map((r) => {
-                        const f = r.fields as { Name?: string; Email?: string; ShoeDescription?: string; Issue?: string; Status?: string; Quote?: number; SubmittedAt?: string };
+                        const f = r.fields as { Name?: string; Email?: string; ShoeDescription?: string; Issue?: string; Status?: string; Quote?: number; SubmittedAt?: string; Photo?: string };
                         return (
                             <AdminRepairRow
                                 key={`${r.id}-${f.Status}-${f.Quote ?? ""}`}
@@ -224,6 +224,7 @@ export default async function DashboardView({ mode, tab = "overview" }: { mode: 
                                 status={f.Status ?? "Pending"}
                                 quote={f.Quote}
                                 submitted={fmtDate(f.SubmittedAt)}
+                                hasPhoto={!!f.Photo}
                             />
                         );
                     })}

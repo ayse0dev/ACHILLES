@@ -2,6 +2,7 @@ import { hit, ipFrom } from "@/lib/rateLimit";
 import { google } from "@ai-sdk/google";
 import { convertToModelMessages, streamText } from "ai";
 import { getFeaturedProducts } from "@/lib/products";
+import { priceOf } from "@/lib/price";
 import { supportOnline } from "@/lib/supportHours";
 
 export const maxDuration = 30;
@@ -19,7 +20,7 @@ export async function POST(req: Request) {
         productContext = products
             .map(
                 (p) =>
-                    `- ${p.name} (₱${p.price.toFixed(2)}), sizes: ${p.sizes.join(", ")}`
+                    `- ${p.name} (₱${priceOf(p).toFixed(2)}${priceOf(p) < p.price ? `, on sale from ₱${p.price.toFixed(2)}` : ""}), sizes: ${p.sizes.join(", ")}`
             )
             .join("\n");
     } catch {

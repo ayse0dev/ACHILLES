@@ -5,6 +5,7 @@ import { getCheckoutSession, verifySignature } from "@/lib/paymongo";
 import { sendEmail } from "@/lib/mail";
 import { notify } from "@/lib/notify";
 import { newReference } from "@/lib/reference";
+import { appUrl } from "@/lib/verify";
 
 export async function POST(request: Request) {
     const secret = process.env.PAYMONGO_WEBHOOK_SECRET;
@@ -56,6 +57,8 @@ export async function POST(request: Request) {
 Reference: ${f.Reference}
 Items: ${f.Items}
 Total: ₱${(f.Total ?? session.total).toFixed(2)}
+
+Your receipt: ${appUrl()}/orders/${f.Reference}
 
 You can follow your delivery on the Orders page.`
         );

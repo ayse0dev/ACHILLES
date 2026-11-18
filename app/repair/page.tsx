@@ -1,13 +1,7 @@
-"use client";
-
-import Honeypot from "@/components/Honeypot";
 import Link from "next/link";
-import { useActionState } from "react";
-import { submitRepair, RepairState } from "./actions";
 import BeforeAfter from "@/components/BeforeAfter";
-import { repairGroups, rushNotes, mailInSteps, repairPolicies } from "@/lib/business";
-
-const initial: RepairState = {};
+import { repairKeyFor } from "@/lib/artSvg";
+import { repairGroups, serviceDetails, rushNotes, mailInSteps, repairPolicies } from "@/lib/business";
 
 const transformations = [
     { label: "Derby", before: "/before-after/derby-before.jpg", after: "/before-after/derby-after.jpg" },
@@ -17,8 +11,6 @@ const transformations = [
 ];
 
 export default function RepairPage() {
-    const [state, formAction, isPending] = useActionState(submitRepair, initial);
-
     return (
         <div className="max-w-5xl mx-auto px-4 py-10 space-y-16">
             <section className="space-y-6">
@@ -31,7 +23,7 @@ export default function RepairPage() {
                 </div>
                 <BeforeAfter pairs={transformations} />
                 <div className="flex flex-wrap gap-3">
-                    <a href="#request" className="btn btn-accent uppercase text-sm tracking-wide">Request a repair quote</a>
+                    <Link href="/book" className="btn btn-accent uppercase text-sm tracking-wide">Request a repair quote</Link>
                     <Link href="/book" className="btn btn-ghost uppercase text-sm tracking-wide">Book a drop-off</Link>
                 </div>
             </section>
@@ -42,26 +34,31 @@ export default function RepairPage() {
                     <h2 className="page-title !text-3xl">Services and turnaround</h2>
                 </div>
                 {repairGroups.map((group) => (
-                    <div key={group.title} className="card overflow-x-auto">
-                        <h3 className="font-black uppercase tracking-tight text-lg px-5 pt-5">{group.title}</h3>
-                        <table className="w-full text-left text-sm mt-3">
-                            <thead className="bg-ink text-white">
-                                <tr>
-                                    <th className="px-5 py-3">Service</th>
-                                    <th className="px-5 py-3">Price</th>
-                                    <th className="px-5 py-3">Turnaround</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                {group.rows.map((row, i) => (
-                                    <tr key={row.service} className={i % 2 ? "bg-purple/5" : ""}>
-                                        <td className="px-5 py-3 font-bold">{row.service}</td>
-                                        <td className="px-5 py-3 text-purple font-bold whitespace-nowrap">{row.price}</td>
-                                        <td className="px-5 py-3 text-ink/70">{row.turnaround}</td>
-                                    </tr>
-                                ))}
-                            </tbody>
-                        </table>
+                    <div key={group.title} className="space-y-4">
+                        <h3 className="font-black uppercase tracking-tight text-xl">{group.title}</h3>
+                        <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-5">
+                            {group.rows.map((row) => (
+                                <article key={row.service} className="card overflow-hidden flex flex-col">
+                                    <img
+                                        src={`/api/art/repair?key=${repairKeyFor(row.service)}`}
+                                        alt={row.service}
+                                        loading="lazy"
+                                        className="w-full aspect-[4/3] object-cover border-b-2 border-ink"
+                                    />
+                                    <div className="p-5 flex flex-col gap-3 flex-1">
+                                        <h4 className="font-display font-bold text-lg leading-snug">{row.service}</h4>
+                                        <div className="flex flex-wrap items-center gap-2 mt-auto">
+                                            <span className="bg-purple/10 text-purple font-bold text-sm rounded-full px-3 py-1">{row.price}</span>
+                                            <span className="bg-teal/15 text-ink/80 text-xs font-bold rounded-full px-3 py-1">{row.turnaround}</span>
+                                        </div>
+                                        <p className="text-sm text-ink/75 leading-relaxed">{serviceDetails[row.service]}</p>
+                                        <Link href={`/book?service=${encodeURIComponent(row.service)}`} aria-label={`Request ${row.service}`} className="btn btn-accent !py-2 text-xs uppercase w-full text-center">
+                                            Request this service
+                                        </Link>
+                                    </div>
+                                </article>
+                            ))}
+                        </div>
                     </div>
                 ))}
             </section>
@@ -95,43 +92,13 @@ export default function RepairPage() {
                 </ul>
             </section>
 
-            <section id="request" className="max-w-md mx-auto w-full scroll-mt-28">
-                {state.success ? (
-                    <div className="card p-8 text-center space-y-4">
-                        <p className="eyebrow">All set</p>
-                        <h2 className="page-title !text-3xl">Request received!</h2>
-                        <p className="text-ink/70">We&apos;ll email you within 24 hours with a quote.</p>
-                        {state.reference && (
-                            <p className="font-black text-2xl tracking-widest">{state.reference}</p>
-                        )}
-                        <p className="text-xs text-ink/60">Keep this reference number to track your repair.</p>
-                        <Link href="/track" className="btn btn-ghost">Track your repair</Link>
-                    </div>
-                ) : (
-                    <div className="card p-6 md:p-8 space-y-5">
-                        <div>
-                            <p className="eyebrow mb-1">Start here</p>
-                            <h2 className="page-title !text-3xl">Request a repair quote</h2>
-                        </div>
-                        <form action={formAction} className="space-y-3">
-<Honeypot />
-                            <input name="name" placeholder="Your name" required className="field" />
-                            <input name="email" type="email" placeholder="Email" required className="field" />
-                            <input name="phone" placeholder="Phone (optional)" className="field" />
-                            <input name="shoeDescription" placeholder="Shoe brand / model" required className="field" />
-                            <textarea name="issue" placeholder="Describe the damage" required rows={4} className="field" />
-                            <input name="photoUrl" type="url" placeholder="Photo URL (optional)" className="field" />
-                            {state.error && <p className="text-red text-sm">{state.error}</p>}
-                            <label className="flex items-start gap-2 text-xs text-ink/70">
-<input type="checkbox" name="consent" required className="mt-0.5" />
-<span>I agree to the <a href="/privacy" target="_blank" className="underline">Privacy Policy</a> and consent to ACHILLES processing my details.</span>
-</label>
-<button disabled={isPending} className="btn btn-accent w-full">
-                                {isPending ? "Submitting..." : "Submit request"}
-                            </button>
-                        </form>
-                    </div>
-                )}
+            <section className="rounded-3xl bg-ink text-white p-8 md:p-10 flex flex-col md:flex-row md:items-center justify-between gap-6">
+                <div>
+                    <p className="text-xs font-bold uppercase tracking-[0.2em] text-white/60">Ready when you are</p>
+                    <h2 className="text-2xl md:text-3xl font-black mt-1">Book your repair in a few clicks</h2>
+                    <p className="text-white/70 text-sm mt-2">Pick your services, see an estimate, and choose drop-off, mail-in or an appointment.</p>
+                </div>
+                <Link href="/book" className="rounded-full bg-white text-ink font-black uppercase tracking-wider text-sm px-8 py-4 text-center">Mag-book ng serbisyo</Link>
             </section>
         </div>
     );

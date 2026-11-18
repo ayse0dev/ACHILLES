@@ -15,6 +15,7 @@ export default function AdminRepairRow({
     status,
     quote,
     submitted,
+    hasPhoto = false,
 }: {
     id: string;
     name: string;
@@ -24,6 +25,7 @@ export default function AdminRepairRow({
     status: string;
     quote?: number;
     submitted: string;
+    hasPhoto?: boolean;
 }) {
     const [state, formAction, isPending] = useActionState(updateRepair, initial);
 
@@ -34,7 +36,10 @@ export default function AdminRepairRow({
                 <p className="font-display font-bold text-lg">{shoe}</p>
                 <p className="text-sm">{name} · {email}</p>
                 <p className="text-xs text-ink/60">Submitted {submitted}</p>
-                <p className="text-sm text-ink/80 pt-2">{issue}</p>
+                <p className="text-sm text-ink/80 pt-2 whitespace-pre-line">{issue}</p>
+                {hasPhoto && (
+                    <a href={`/api/repair-photo/${id}`} target="_blank" rel="noreferrer" className="text-xs underline font-bold">View customer photo</a>
+                )}
             </div>
             <div className="space-y-2">
                 <select name="status" defaultValue={status} className="field !py-2">

@@ -16,6 +16,8 @@ export interface ProductFields {
     Description: string;
     Stock: number;
     Category?: string;
+    SalePrice?: number;
+    Badge?: string;
 }
 
 export interface Product {
@@ -28,6 +30,8 @@ export interface Product {
     description: string;
     stock: number;
     category?: string;
+    salePrice?: number;
+    badge?: string;
 }
 
 export function mapProduct(record: {
@@ -48,5 +52,7 @@ export function mapProduct(record: {
         description: f.Description ?? "",
         stock: f.Stock ?? 0,
         category: f.Category,
+        salePrice: typeof f.SalePrice === "number" && f.SalePrice > 0 ? f.SalePrice : undefined,
+        badge: f.Badge || undefined,
     };
 }

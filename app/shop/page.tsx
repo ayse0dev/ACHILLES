@@ -2,9 +2,12 @@ import { Suspense } from "react";
 import { getProducts } from "@/lib/products";
 import LoadMore from "@/components/LoadMore";
 import CategoryTiles from "@/components/CategoryTiles";
+import { parseCategory } from "@/lib/categories";
 
-export default async function ShopPage() {
-    const { products, nextOffset } = await getProducts({ maxRecords: 12 });
+export default async function ShopPage({ searchParams }: { searchParams: Promise<{ category?: string }> }) {
+    const { category: rawCategory } = await searchParams;
+    const category = parseCategory(rawCategory);
+    const { products, nextOffset } = await getProducts({ maxRecords: 12, category });
 
     return (
         <div className="max-w-7xl mx-auto px-4 md:px-6 py-12 space-y-14">
@@ -15,9 +18,9 @@ export default async function ShopPage() {
             </section>
 
             <section>
-                <h2 className="uppercase font-black text-2xl tracking-tight mb-6">All shoes</h2>
+                <h2 id="products" className="uppercase font-black text-2xl tracking-tight mb-6">{category ? `${category} products` : "All shoes"}</h2>
                 <Suspense fallback={null}>
-                    <LoadMore initialProducts={products} initialOffset={nextOffset} />
+                    <LoadMore key={category ?? "all"} initialProducts={products} initialOffset={nextOffset} category={category ?? "All"} />
                 </Suspense>
             </section>
         </div>

@@ -66,7 +66,12 @@ export default async function OrdersPage({
                                 {f.Status === "Delivered" && f.Reference && (
                                     <Link href={`/reviews?ref=${f.Reference}`} className="underline font-bold text-sm">Review this order</Link>
                                 )}
-                                <p className="font-black text-purple">₱{(f.Total ?? 0).toFixed(2)}</p>
+                                <div className="flex items-center justify-between gap-3">
+                                    <p className="font-black text-purple">₱{(f.Total ?? 0).toFixed(2)}</p>
+                                    {f.Reference && ["Paid", "Packed", "Shipped", "Delivered"].includes(f.Status ?? "") && (
+                                        <Link href={`/orders/${f.Reference}`} className="underline font-bold text-sm">View receipt</Link>
+                                    )}
+                                </div>
                             </li>
                         );
                     })}

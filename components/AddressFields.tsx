@@ -38,6 +38,39 @@ export function draftComplete(d: AddressDraft) {
 
 type Item = { code: string; name: string };
 
+type Geo = { regions: string[]; cities: string[]; barangays: string[]; street: string };
+
+function norm(s: string) {
+    return s
+        .toLowerCase()
+        .replace(/\(.*?\)/g, " ")
+        .replace(/city of|municipality of|\bcity\b|barangay|brgy\.?|\bregion\b/g, " ")
+        .replace(/[^a-z0-9]+/g, " ")
+        .trim();
+}
+
+function matchItem(items: Item[], candidates: string[]): Item | null {
+    const wanted = candidates.map(norm).filter(Boolean);
+    for (const w of wanted) {
+        const exact = items.find((i) => norm(i.name) === w);
+        if (exact) return exact;
+    }
+    for (const w of wanted) {
+        const partial = items.find((i) => {
+            const n = norm(i.name);
+            return n && (n.includes(w) || w.includes(n));
+        });
+        if (partial) return partial;
+    }
+    return null;
+}
+
+function matchRegion(items: Item[], candidates: string[]): Item | null {
+    const ncr = candidates.some((c) => /metro manila|national capital|manila/i.test(c));
+    if (ncr) return items.find((i) => /national capital/i.test(i.name)) ?? null;
+    return matchItem(items, candidates);
+}
+
 async function load(query: string): Promise<Item[]> {
     try {
         const res = await fetch(`/api/psgc?${query}`);
@@ -61,6 +94,8 @@ export default function AddressFields({
     const [cities, setCities] = useState<Item[]>([]);
     const [barangays, setBarangays] = useState<Item[]>([]);
     const [loading, setLoading] = useState("");
+    const [locating, setLocating] = useState(false);
+    const [note, setNote] = useState("");
 
     useEffect(() => {
         let stop = false;
@@ -115,13 +150,95 @@ export default function AddressFields({
         onChange({ ...value, cityCode: code, municipality: item?.name ?? "", barangay: "" });
     };
 
+
+    const fillFrom = useCallback(
+        async (lat: number, lng: number) => {
+            setNote("");
+            let geo: Geo | null = null;
+            try {
+                const res = await fetch(`/api/geocode?lat=${lat}&lng=${lng}`);
+                if (res.ok) geo = (await res.json()) as Geo;
+            } catch {
+                geo = null;
+            }
+            const base = { ...value, lat, lng };
+            if (!geo) {
+                onChange(base);
+                setNote("Pin saved. We could not auto-fill the address, please choose it below.");
+                return;
+            }
+            const region = matchRegion(regions, geo.regions);
+            if (!region) {
+                onChange({ ...base, street: value.street || geo.street });
+                setNote("Pin saved. Please choose your region, municipality and barangay below.");
+                return;
+            }
+            const cityList = await load(`type=cities&parent=${region.code}`);
+            const city = matchItem(cityList, geo.cities);
+            let barangayList: Item[] = [];
+            let barangay: Item | null = null;
+            if (city) {
+                barangayList = await load(`type=barangays&parent=${city.code}`);
+                barangay = matchItem(barangayList, geo.barangays);
+            }
+            setCities(cityList);
+            setBarangays(barangayList);
+            onChange({
+                ...base,
+                regionCode: region.code,
+                region: region.name,
+                cityCode: city?.code ?? "",
+                municipality: city?.name ?? "",
+                barangay: barangay?.name ?? "",
+                street: value.street || geo.street,
+            });
+            setNote(
+                city && barangay
+                    ? "Address filled from your location. Please check it and add your house number."
+                    : "Pin saved and address partly filled. Please complete the rest below."
+            );
+        },
+        [regions, value, onChange]
+    );
+
+    const useGps = () => {
+        if (!navigator.geolocation) {
+            setNote("Your browser cannot share location. Tap the map instead.");
+            return;
+        }
+        setLocating(true);
+        setNote("");
+        navigator.geolocation.getCurrentPosition(
+            async (pos) => {
+                await fillFrom(pos.coords.latitude, pos.coords.longitude);
+                setLocating(false);
+            },
+            (err) => {
+                setNote(
+                    err.code === err.PERMISSION_DENIED
+                        ? "Location is blocked. Allow location for this site in your browser, or tap the map to drop a pin."
+                        : "Could not get your location. Tap the map to drop a pin."
+                );
+                setLocating(false);
+            },
+            { enableHighAccuracy: true, timeout: 12000 }
+        );
+    };
+
     const pickPin = useCallback(
-        (p: { lat: number; lng: number } | null) => onChange({ ...value, lat: p?.lat ?? null, lng: p?.lng ?? null }),
-        [onChange, value]
+        (p: { lat: number; lng: number } | null) => {
+            if (p) void fillFrom(p.lat, p.lng);
+            else onChange({ ...value, lat: null, lng: null });
+        },
+        [fillFrom, onChange, value]
     );
 
     return (
         <div className="space-y-3">
+            <button type="button" onClick={useGps} disabled={locating} className="btn btn-accent w-full !py-2 text-sm disabled:opacity-60">
+                {locating ? "Finding you..." : "📍 Use my location (GPS) and fill in automatically"}
+            </button>
+            {note && <p className="text-xs font-bold text-ink/70">{note}</p>}
             {withLabel && (
                 <input
                     value={value.label}

@@ -4,9 +4,20 @@ import Link from "next/link";
 import { signOut } from "next-auth/react";
 import { useEffect, useRef, useState } from "react";
 
-export default function AccountMenu({ name, email, role }: { name: string; email: string; role: string }) {
+export default function AccountMenu({ userId, name, email, role }: { userId: string; name: string; email: string; role: string }) {
     const [open, setOpen] = useState(false);
     const ref = useRef<HTMLDivElement>(null);
+    const [version, setVersion] = useState(() => Date.now());
+    const [broken, setBroken] = useState(false);
+
+    useEffect(() => {
+        const bump = () => {
+            setBroken(false);
+            setVersion(Date.now());
+        };
+        window.addEventListener("avatar-updated", bump);
+        return () => window.removeEventListener("avatar-updated", bump);
+    }, []);
 
     useEffect(() => {
         function onClick(e: MouseEvent) {
@@ -32,9 +43,13 @@ export default function AccountMenu({ name, email, role }: { name: string; email
                 onClick={() => setOpen((v) => !v)}
                 aria-label="Account menu"
                 aria-expanded={open}
-                className="w-10 h-10 rounded-full bg-purple text-white font-black flex items-center justify-center"
+                className="w-10 h-10 rounded-full bg-purple text-white font-black flex items-center justify-center overflow-hidden"
             >
-                {initial}
+                {userId && !broken ? (
+                    <img src={`/api/avatar/${userId}?v=${version}`} alt="" className="w-full h-full object-cover" onError={() => setBroken(true)} />
+                ) : (
+                    initial
+                )}
             </button>
             {open && (
                 <div className="absolute right-0 mt-2 w-64 card p-2 z-50" role="menu">

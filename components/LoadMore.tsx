@@ -1,7 +1,9 @@
 "use client";
 
+import { priceOf } from "@/lib/price";
 import { useMemo, useState } from "react";
-import { useSearchParams } from "next/navigation";
+import Link from "next/link";
+import { productCategories } from "@/lib/categories";
 import type { Product } from "@/lib/airtable";
 import ProductCard from "./ProductCard";
 
@@ -17,44 +19,39 @@ const sortOptions: { key: SortKey; label: string }[] = [
 export default function LoadMore({
     initialProducts,
     initialOffset,
+    category,
 }: {
     initialProducts: Product[];
     initialOffset?: string;
+    category: string;
 }) {
-    const params = useSearchParams();
     const [products, setProducts] = useState(initialProducts);
     const [offset, setOffset] = useState<string | undefined>(initialOffset);
     const [loading, setLoading] = useState(false);
     const [done, setDone] = useState(!initialOffset);
     const [query, setQuery] = useState("");
-    const [category, setCategory] = useState<string>(params.get("category") ?? "All");
     const [sort, setSort] = useState<SortKey>("featured");
 
-    const categories = useMemo(() => {
-        const set = new Set<string>();
-        products.forEach((p) => p.category && set.add(p.category));
-        return ["All", ...Array.from(set).sort()];
-    }, [products]);
+    const categories = ["All", ...productCategories];
 
     const visible = useMemo(() => {
         const q = query.trim().toLowerCase();
         const filtered = products.filter(
             (p) =>
-                (category === "All" || p.category === category) &&
                 (!q || p.name.toLowerCase().includes(q) || p.description.toLowerCase().includes(q))
         );
         const sorted = [...filtered];
-        if (sort === "low") sorted.sort((a, b) => a.price - b.price);
-        if (sort === "high") sorted.sort((a, b) => b.price - a.price);
+        if (sort === "low") sorted.sort((a, b) => priceOf(a) - priceOf(b));
+        if (sort === "high") sorted.sort((a, b) => priceOf(b) - priceOf(a));
         if (sort === "name") sorted.sort((a, b) => a.name.localeCompare(b.name));
         return sorted;
-    }, [products, query, category, sort]);
+    }, [products, query, sort]);
 
     async function loadMore() {
         if (!offset) return;
         setLoading(true);
         try {
-            const res = await fetch(`/api/products?limit=12&offset=${encodeURIComponent(offset)}`);
+            const res = await fetch(`/api/products?limit=12&offset=${encodeURIComponent(offset)}${category === "All" ? "" : `&category=${encodeURIComponent(category)}`}`);
             const data = await res.json();
             const incoming: Product[] = data.products ?? [];
             if (incoming.length === 0) {
@@ -78,15 +75,15 @@ export default function LoadMore({
             <div className="flex flex-col gap-4 mb-8">
                 <div className="flex flex-wrap gap-2">
                     {categories.map((c) => (
-                        <button
+                        <Link
                             key={c}
-                            type="button"
-                            aria-pressed={category === c}
-                            onClick={() => setCategory(c)}
-                            className="chip uppercase text-xs font-bold tracking-wide"
+                            href={c === "All" ? "/shop#products" : `/shop?category=${c}#products`}
+                            scroll={false}
+                            aria-current={category === c ? "true" : undefined}
+                            className={`chip uppercase text-xs font-bold tracking-wide ${category === c ? "!bg-ink !text-white" : ""}`}
                         >
                             {c}
-                        </button>
+                        </Link>
                     ))}
                 </div>
                 <div className="flex flex-col md:flex-row gap-3 md:items-center md:justify-between">

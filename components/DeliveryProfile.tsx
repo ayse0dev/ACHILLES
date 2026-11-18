@@ -8,7 +8,7 @@ import { addressLine, type Address } from "@/lib/addressTypes";
 
 const initial: DeliveryState = {};
 
-function PhoneSection({ phone }: { phone: string }) {
+export function PhoneSection({ phone }: { phone: string }) {
     const [state, action, pending] = useActionState(savePhone, initial);
     const [value, setValue] = useState(phone.replace(/^\+63/, ""));
     return (
@@ -22,7 +22,7 @@ function PhoneSection({ phone }: { phone: string }) {
     );
 }
 
-function BankSection({ bank, holder, last4 }: { bank: string; holder: string; last4: string }) {
+export function BankSection({ bank, holder, last4 }: { bank: string; holder: string; last4: string }) {
     const [state, action, pending] = useActionState(saveBank, initial);
     return (
         <form action={action} className="card p-6 space-y-3">
@@ -42,7 +42,7 @@ function BankSection({ bank, holder, last4 }: { bank: string; holder: string; la
     );
 }
 
-function AddressSection({ addresses }: { addresses: Address[] }) {
+export function AddressSection({ addresses }: { addresses: Address[] }) {
     const [state, action, pending] = useActionState(saveAddress, initial);
     const [draft, setDraft] = useState<AddressDraft>(emptyDraft);
     const [adding, setAdding] = useState(false);
@@ -109,24 +109,6 @@ function AddressSection({ addresses }: { addresses: Address[] }) {
             ) : (
                 <button onClick={() => setAdding(true)} className="btn btn-ink">Add address</button>
             )}
-        </div>
-    );
-}
-
-export default function DeliveryProfile({
-    phone,
-    addresses,
-    bank,
-}: {
-    phone: string;
-    addresses: Address[];
-    bank: { name: string; holder: string; last4: string };
-}) {
-    return (
-        <div className="space-y-6">
-            <PhoneSection phone={phone} />
-            <AddressSection addresses={addresses} />
-            <BankSection bank={bank.name} holder={bank.holder} last4={bank.last4} />
         </div>
     );
 }

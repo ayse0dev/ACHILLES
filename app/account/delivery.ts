@@ -90,3 +90,23 @@ export async function makeHome(id: string) {
     await base("Addresses").update(id, { Home: true });
     revalidatePath("/profile");
 }
+
+export async function saveAvatar(_prev: DeliveryState, formData: FormData): Promise<DeliveryState> {
+    const user = await getCurrentUser();
+    if (!user) return { error: "Log in first." };
+    if (formData.get("remove")) {
+        await base("Users").update(user.id, { Avatar: "" });
+        revalidatePath("/profile");
+        return { success: true };
+    }
+    const data = String(formData.get("avatar") ?? "");
+    const match = /^data:image\/jpeg;base64,([A-Za-z0-9+/=]+)$/.exec(data);
+    if (!match || data.length > 90000) return { error: "Please choose a smaller photo (JPG or PNG)." };
+    const bytes = Buffer.from(match[1], "base64");
+    if (bytes.length < 100 || bytes[0] !== 0xff || bytes[1] !== 0xd8 || bytes[2] !== 0xff) {
+        return { error: "That file is not a valid image." };
+    }
+    await base("Users").update(user.id, { Avatar: data });
+    revalidatePath("/profile");
+    return { success: true };
+}

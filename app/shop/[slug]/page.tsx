@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { priceOf } from "@/lib/price";
 import { notFound } from "next/navigation";
 import { getProductBySlug } from "@/lib/products";
 import { getWishlistSlugs } from "@/lib/wishlist";
@@ -44,7 +45,12 @@ export default async function ProductPage({
                         {product.category && <p className="text-sm text-ink/60">{product.category}</p>}
                     </div>
 
-                    <p className="text-2xl font-bold">₱{product.price.toFixed(2)}</p>
+                    <p className="text-2xl font-bold">
+                        ₱{priceOf(product).toFixed(2)}
+                        {priceOf(product) < product.price && (
+                            <span className="ml-3 text-base font-normal text-ink/50 line-through">₱{product.price.toFixed(2)}</span>
+                        )}
+                    </p>
 
                     {product.stock > 0 && product.stock <= 3 && (
                         <p className="text-sm font-bold text-orange uppercase tracking-wide">
@@ -56,7 +62,7 @@ export default async function ProductPage({
                         product={{
                             slug: product.slug,
                             name: product.name,
-                            price: product.price,
+                            price: priceOf(product),
                             image: product.images[0],
                             sizes: product.sizes,
                             stock: product.stock,
