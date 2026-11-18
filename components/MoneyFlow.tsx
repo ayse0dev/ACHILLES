@@ -9,23 +9,23 @@ export default function MoneyFlow({ days, shopTotal, repairTotal }: { days: DayT
         <div className="card p-6 space-y-5 sm:col-span-2 lg:col-span-4">
             <div className="flex flex-wrap gap-6">
                 <div>
-                    <p className="text-xs uppercase font-bold text-ink/60">Shop sales</p>
-                    <p className="text-3xl font-black text-purple">{peso(shopTotal)}</p>
+                    <p className="text-xs text-ink/60">Shop sales</p>
+                    <p className="text-2xl font-semibold">{peso(shopTotal)}</p>
                 </div>
                 <div>
-                    <p className="text-xs uppercase font-bold text-ink/60">Completed repairs</p>
-                    <p className="text-3xl font-black text-teal">{peso(repairTotal)}</p>
+                    <p className="text-xs text-ink/60">Completed repairs</p>
+                    <p className="text-2xl font-semibold">{peso(repairTotal)}</p>
                 </div>
                 <div>
-                    <p className="text-xs uppercase font-bold text-ink/60">Total money in</p>
-                    <p className="text-3xl font-black">{peso(shopTotal + repairTotal)}</p>
+                    <p className="text-xs text-ink/60">Total money in</p>
+                    <p className="text-2xl font-semibold">{peso(shopTotal + repairTotal)}</p>
                 </div>
             </div>
             <div className="flex items-end gap-2 h-40" role="img" aria-label="Money in over the last 14 days">
                 {days.map((d) => (
                     <div key={d.label} className="flex-1 flex flex-col items-center justify-end h-full gap-1">
                         <div className="w-full flex flex-col justify-end flex-1">
-                            <div className="bg-teal rounded-t" style={{ height: `${(d.repair / max) * 100}%` }} />
+                            <div className="bg-teal" style={{ height: `${(d.repair / max) * 100}%` }} />
                             <div className="bg-purple" style={{ height: `${(d.shop / max) * 100}%` }} />
                         </div>
                         <span className="text-[10px] text-ink/60">{d.label}</span>

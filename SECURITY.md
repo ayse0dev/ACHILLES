@@ -3,7 +3,7 @@
 Status: **Done** = in the code now. **Planned** = you or the host must do it. **N/A** = does not apply to this stack.
 Priority: **Critical** do first, **High**, **Medium**, **Low**.
 
-ACHILLES is a Next.js app with Airtable as the database, PayMongo for payments, and Brevo for email. There is no WordPress, PHP, SQL database or file upload, so some items from the brief do not apply.
+ACHILLES is a Next.js app with Airtable as the database, Xendit for payments, and Brevo for email. There is no WordPress, PHP, SQL database or file upload, so some items from the brief do not apply.
 
 ## Plain-language summary
 
@@ -11,8 +11,8 @@ ACHILLES is a Next.js app with Airtable as the database, PayMongo for payments, 
 - Logins already need a password plus an emailed code. Admin and staff sessions now end after 8 hours, or after 30 minutes of no activity.
 - Spam bots are caught by a hidden field. Customers must agree to the Privacy Policy before registering or booking a repair.
 - Staff actions (repair, order, stock, ticket and role changes, plus logins and failed logins) are written to an `AuditLogs` table. Staff see masked customer emails; only admins see full ones.
-- Card details never touch your server. PayMongo hosts the payment page and the webhook is signature-checked.
-- Things only you can do: put the site behind Cloudflare, use a host with backups, turn on 2FA on every account (Airtable, PayMongo, Brevo, domain, GitHub), set up SPF/DKIM/DMARC on your own domain, and rotate the Brevo key that appeared in a screenshot.
+- Card details never touch your server. Xendit hosts the payment page and the webhook is signature-checked.
+- Things only you can do: put the site behind Cloudflare, use a host with backups, turn on 2FA on every account (Airtable, Xendit, Brevo, domain, GitHub), set up SPF/DKIM/DMARC on your own domain, and rotate the Brevo key that appeared in a screenshot.
 
 ## 1. Hosting and infrastructure
 
@@ -24,7 +24,7 @@ ACHILLES is a Next.js app with Airtable as the database, PayMongo for payments, 
 | WAF / CDN / DDoS | Planned | High | Cloudflare Free covers DDoS and basic bot rules (about 0 PHP/month). Pro is about USD 20/month if you need a managed WAF ruleset. |
 | Patching | Planned | High | Run `npm audit` monthly and enable GitHub Dependabot (free). See "Known issues" below. |
 | Directory listing, file permissions | N/A | Low | Next.js serves only built routes. On a managed host there is no web directory to list. |
-| Staging vs production | Planned | Medium | Use a Vercel preview deployment with a separate Airtable base and PayMongo test keys. |
+| Staging vs production | Planned | Medium | Use a Vercel preview deployment with a separate Airtable base and Xendit test keys. |
 
 ## 2. Authentication and access
 
@@ -54,9 +54,9 @@ ACHILLES is a Next.js app with Airtable as the database, PayMongo for payments, 
 
 | Item | Status | Priority | Notes |
 |---|---|---|---|
-| No card data on our servers | Done | Critical | PayMongo hosted checkout handles cards, GCash and Maya. |
-| Webhook signature check | Done | Critical | `app/api/paymongo/webhook/route.ts` verifies the signature. |
-| GCash / Maya | Done | High | Enabled through PayMongo hosted checkout. Turn each method on in the PayMongo dashboard, and complete business verification before going live. |
+| No card data on our servers | Done | Critical | Xendit hosted checkout handles cards, GCash and Maya. |
+| Webhook signature check | Done | Critical | `app/api/xendit/webhook/route.ts` verifies the signature. |
+| GCash / Maya | Done | High | Enabled through Xendit hosted checkout. Turn each method on in the Xendit dashboard, and complete business verification before going live. |
 | Data minimisation | Done | Medium | Only name, email, phone, items and notes are collected. |
 | Encryption in transit and at rest | Done | High | TLS in transit. Airtable encrypts at rest. |
 | RA 10173 compliance | Done / Planned | High | Privacy Policy at `/privacy` and consent checkboxes are in. Still needed: register with the National Privacy Commission if you qualify, name a data protection officer, and keep a retention schedule. |
@@ -98,8 +98,8 @@ ACHILLES is a Next.js app with Airtable as the database, PayMongo for payments, 
 |---|---|---|---|
 | Secrets in env variables | Done | Critical | `.env.local` is git-ignored. Set the same variables in your host's dashboard. |
 | Rotate keys | Planned | Critical | Rotate the Brevo SMTP key now (it appeared in a screenshot). Then every 6 to 12 months. |
-| Minimum API scopes | Planned | High | Make the Airtable token scoped to this base only, with data read and write but not schema or webhook access. Never expose the PayMongo secret key; use the public key only in browsers (this site never needs it). |
-| Vet integrations | Planned | Medium | Review Airtable, PayMongo, Brevo and Google (chat) privacy and security pages. |
+| Minimum API scopes | Planned | High | Make the Airtable token scoped to this base only, with data read and write but not schema or webhook access. Never expose the Xendit secret key; use the public key only in browsers (this site never needs it). |
+| Vet integrations | Planned | Medium | Review Airtable, Xendit, Brevo and Google (chat) privacy and security pages. |
 
 ## Airtable tables to add
 

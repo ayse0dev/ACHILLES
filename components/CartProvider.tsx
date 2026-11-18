@@ -1,6 +1,7 @@
 "use client";
 
-import { createContext, useCallback, useContext, useMemo, useSyncExternalStore, ReactNode } from "react";
+import { createContext, useCallback, useContext, useEffect, useMemo, useSyncExternalStore, ReactNode } from "react";
+import { useSession } from "next-auth/react";
 
 export type CartItem = {
     slug: string;
@@ -15,13 +16,14 @@ type CartContextValue = {
     items: CartItem[];
     count: number;
     subtotal: number;
-    add: (item: Omit<CartItem, "qty">) => void;
+    add: (item: Omit<CartItem, "qty">) => boolean;
     setQty: (slug: string, size: string, qty: number) => void;
     remove: (slug: string, size: string) => void;
     clear: () => void;
 };
 
-const STORAGE_KEY = "achilles-cart";
+const LEGACY_KEY = "achilles-cart";
+const keyFor = (userId: string) => `achilles-cart:${userId}`;
 const CHANGE_EVENT = "achilles-cart-change";
 const EMPTY = "[]";
 
@@ -36,9 +38,10 @@ function subscribe(callback: () => void) {
     };
 }
 
-function readRaw(): string {
+function readRaw(key: string): string {
+    if (!key) return EMPTY;
     try {
-        return localStorage.getItem(STORAGE_KEY) ?? EMPTY;
+        return localStorage.getItem(key) ?? EMPTY;
     } catch {
         return EMPTY;
     }
@@ -53,46 +56,64 @@ function parseItems(raw: string): CartItem[] {
     }
 }
 
-function writeItems(items: CartItem[]) {
+function writeItems(key: string, items: CartItem[]) {
+    if (!key) return;
     try {
-        localStorage.setItem(STORAGE_KEY, JSON.stringify(items));
+        localStorage.setItem(key, JSON.stringify(items));
     } catch {
         return;
     }
     window.dispatchEvent(new Event(CHANGE_EVENT));
 }
 
-function update(fn: (items: CartItem[]) => CartItem[]) {
-    writeItems(fn(parseItems(readRaw())));
+function update(key: string, fn: (items: CartItem[]) => CartItem[]) {
+    writeItems(key, fn(parseItems(readRaw(key))));
 }
 
 export function CartProvider({ children }: { children: ReactNode }) {
-    const raw = useSyncExternalStore(subscribe, readRaw, () => EMPTY);
+    const { data: session } = useSession();
+    const userId = String((session?.user as { id?: string } | undefined)?.id ?? "");
+    const key = userId ? keyFor(userId) : "";
+    const raw = useSyncExternalStore(subscribe, () => readRaw(key), () => EMPTY);
+
+    // The cart belongs to the logged-in account only. Remove the old shared cart that any visitor could see.
+    useEffect(() => {
+        try {
+            localStorage.removeItem(LEGACY_KEY);
+        } catch {
+            return;
+        }
+    }, []);
     const items = useMemo(() => parseItems(raw), [raw]);
 
     const add = useCallback((item: Omit<CartItem, "qty">) => {
-        update((prev) => {
+        if (!key) {
+            window.location.assign(`/login?callbackUrl=${encodeURIComponent(window.location.pathname)}`);
+            return false;
+        }
+        update(key, (prev) => {
             const existing = prev.find((p) => p.slug === item.slug && p.size === item.size);
             if (existing) {
                 return prev.map((p) => (p === existing ? { ...p, qty: p.qty + 1 } : p));
             }
             return [...prev, { ...item, qty: 1 }];
         });
-    }, []);
+        return true;
+    }, [key]);
 
     const setQty = useCallback((slug: string, size: string, qty: number) => {
-        update((prev) =>
+        update(key, (prev) =>
             qty <= 0
                 ? prev.filter((p) => !(p.slug === slug && p.size === size))
                 : prev.map((p) => (p.slug === slug && p.size === size ? { ...p, qty } : p))
         );
-    }, []);
+    }, [key]);
 
     const remove = useCallback((slug: string, size: string) => {
-        update((prev) => prev.filter((p) => !(p.slug === slug && p.size === size)));
-    }, []);
+        update(key, (prev) => prev.filter((p) => !(p.slug === slug && p.size === size)));
+    }, [key]);
 
-    const clear = useCallback(() => writeItems([]), []);
+    const clear = useCallback(() => writeItems(key, []), [key]);
 
     const value = useMemo<CartContextValue>(
         () => ({

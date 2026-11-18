@@ -151,8 +151,52 @@ export async function updateRole(_prev: AdminState, formData: FormData): Promise
         return { error: "You can't remove your own admin role." };
     }
 
+    const target = await base("Users").find(parsed.data.id).catch(() => null);
+    if (!target) return { error: "That account no longer exists." };
+    const targetRole = String((target.fields as { Role?: string }).Role ?? "customer").toLowerCase();
+    if (targetRole === "admin") {
+        return { error: "Admin is a permanent role and can't be changed." };
+    }
+    if (parsed.data.role === "admin") {
+        return { error: "New admin accounts cannot be created from the dashboard." };
+    }
+
     await audit(user.email, "change_role", parsed.data.id, `role=${parsed.data.role}`);
     await base("Users").update(parsed.data.id, { Role: roleLabel(parsed.data.role) });
+    revalidatePath("/admin");
+    revalidatePath("/staff");
+    return { success: true };
+}
+
+export async function deleteAccount(_prev: AdminState, formData: FormData): Promise<AdminState> {
+    const user = await getCurrentUser();
+    if (!user || !isAdmin(user.role)) return { error: "Only admins can delete accounts." };
+
+    const parsed = z.object({ id: z.string().min(1) }).safeParse({ id: formData.get("id") });
+    if (!parsed.success) return { error: "Invalid account." };
+    if (parsed.data.id === user.id) return { error: "You can't delete your own account." };
+
+    const target = await base("Users").find(parsed.data.id).catch(() => null);
+    if (!target) return { error: "That account no longer exists." };
+    const f = target.fields as { Email?: string; Role?: string };
+    const role = String(f.Role ?? "customer").toLowerCase();
+    if (role === "admin") return { error: "Admin accounts can't be deleted from the dashboard." };
+
+    // Remove the person's saved delivery addresses along with the account.
+    // Orders and repair records are kept for the shop's bookkeeping.
+    if (f.Email) {
+        const addresses = await base("Addresses")
+            .select({ filterByFormula: `LOWER({Email}) = LOWER(${formulaString(f.Email)})` })
+            .all()
+            .catch(() => []);
+        for (let i = 0; i < addresses.length; i += 10) {
+            await base("Addresses").destroy(addresses.slice(i, i + 10).map((a) => a.id)).catch(() => null);
+        }
+    }
+
+    await audit(user.email, "delete_account", parsed.data.id, `role=${role}`);
+    await base("Users").destroy(parsed.data.id);
+
     revalidatePath("/admin");
     revalidatePath("/staff");
     return { success: true };
@@ -232,7 +276,7 @@ export async function createAccount(_prev: AdminState, formData: FormData): Prom
         .object({
             name: z.string().trim().min(2).max(80),
             email: z.string().trim().email(),
-            role: z.enum(["staff", "admin"]),
+            role: z.literal("staff"),
         })
         .safeParse({ name: formData.get("name"), email: formData.get("email"), role: formData.get("role") });
     if (!parsed.success) return { error: "Enter a name, a valid email and a role." };

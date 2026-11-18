@@ -22,14 +22,14 @@ export default function AdminStockRow({
             <input type="hidden" name="slug" value={slug} />
             <div>
                 <p className="font-bold">{name}</p>
-                <p className={`text-xs font-bold uppercase ${low ? "text-orange" : "text-ink/60"}`}>
+                <p className={`text-xs font-medium ${low ? "text-orange" : "text-ink/60"}`}>
                     {stock} in stock{low ? " · low" : ""}
                 </p>
             </div>
             <input name="change" type="number" step="1" placeholder="+ in / − out" required className="field !py-2" />
             <input name="note" placeholder="Note (supplier, reason)" className="field !py-2" />
             <div className="space-y-1">
-                <button disabled={isPending} className="btn btn-ink !py-2 !px-5 text-xs uppercase">
+                <button disabled={isPending} className="btn btn-ink !py-2 !px-5 text-sm">
                     {isPending ? "Saving" : "Update"}
                 </button>
                 {state.error && <p className="text-xs text-red">{state.error}</p>}

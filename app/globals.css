@@ -312,3 +312,47 @@ body {
 @media (prefers-reduced-motion: reduce) {
   .ride-bob, .ride-wheel { animation: none; }
 }
+
+/* Admin and staff dashboards: a quiet, neutral look. Scoped so the shop keeps its own style. */
+.admin-ui {
+  --color-ink: #111827;
+  --color-purple: #2563eb;
+  --color-teal: #0e7490;
+  --color-orange: #b45309;
+  --color-red: #dc2626;
+  --color-yellow: #a16207;
+  font-family: ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+  color: #111827;
+  font-size: 0.9375rem;
+}
+.admin-ui h1, .admin-ui h2, .admin-ui .font-display { font-family: inherit; }
+.admin-ui .card {
+  border-radius: 8px;
+  border: 1px solid #e5e7eb;
+  box-shadow: none;
+  overflow: visible;
+}
+.admin-ui .field {
+  padding: 0.5rem 0.75rem;
+  border-radius: 6px;
+  border: 1px solid #d1d5db;
+  font-size: 0.875rem;
+}
+.admin-ui .field:focus {
+  border-color: #111827;
+  box-shadow: 0 0 0 3px rgba(17, 24, 39, 0.08);
+}
+.admin-ui .btn {
+  padding: 0.5rem 1rem;
+  border-radius: 6px;
+  font-weight: 600;
+  font-size: 0.8125rem;
+  letter-spacing: 0;
+}
+.admin-ui .btn:hover:not(:disabled) { transform: none; }
+.admin-ui .btn-ink { background: #111827; color: #fff; }
+.admin-ui .btn-ink:hover:not(:disabled) { background: #374151; }
+.admin-ui .btn-ghost { background: #fff; color: #111827; border: 1px solid #d1d5db; }
+.admin-ui .btn-ghost:hover:not(:disabled) { background: #f3f4f6; }
+.admin-ui .btn-accent { background: #111827; color: #fff; }
+.admin-ui .btn-accent:hover:not(:disabled) { background: #374151; }

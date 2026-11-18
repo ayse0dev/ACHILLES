@@ -4,6 +4,7 @@ import { discountLabel, formatMoney, isReceiptReady, loadReceipt, paymentLabel }
 import { contact } from "@/lib/business";
 import AutoRefresh from "@/components/AutoRefresh";
 import PrintButton from "@/components/PrintButton";
+import ClearCart from "@/components/ClearCart";
 
 export const dynamic = "force-dynamic";
 
@@ -39,10 +40,13 @@ export default async function ReceiptPage({
         );
     }
 
+    const justPaidOrder = receipt.kind === "order" && !!paid;
+
     if (!isReceiptReady(receipt)) {
         const waiting = receipt.kind === "order" && receipt.status === "Pending payment" && !!paid;
         return (
             <div className="max-w-xl mx-auto px-4 py-20 text-center space-y-5">
+                {justPaidOrder && <ClearCart />}
                 {waiting && <AutoRefresh seconds={4} />}
                 <p className="eyebrow">{receipt.reference}</p>
                 <h1 className="page-title !text-3xl">{waiting ? "Confirming your payment..." : "Receipt not ready yet"}</h1>
@@ -66,6 +70,7 @@ export default async function ReceiptPage({
 
     return (
         <div className="max-w-3xl mx-auto px-4 py-10 space-y-6">
+            {justPaidOrder && <ClearCart />}
             <div className="flex flex-wrap items-center justify-between gap-3 print:hidden">
                 <div>
                     <p className="eyebrow mb-1">Payment complete</p>

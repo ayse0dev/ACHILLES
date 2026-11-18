@@ -1,4 +1,5 @@
 import Link from "next/link";
+import ClearCart from "@/components/ClearCart";
 import DeliveryProgress from "@/components/DeliveryProgress";
 import { base } from "@/lib/airtable";
 import { formulaString } from "@/lib/formula";
@@ -7,9 +8,9 @@ import { getCurrentUser } from "@/lib/session";
 export default async function OrdersPage({
     searchParams,
 }: {
-    searchParams: Promise<{ paid?: string; placed?: string }>;
+    searchParams: Promise<{ paid?: string; placed?: string; repairPaid?: string }>;
 }) {
-    const { paid, placed } = await searchParams;
+    const { paid, placed, repairPaid } = await searchParams;
     const user = await getCurrentUser();
 
     if (!user) {
@@ -36,6 +37,12 @@ export default async function OrdersPage({
                 <p className="eyebrow mb-2">Your account</p>
                 <h1 className="page-title">Your orders</h1>
             </div>
+
+            {(placed || paid) && <ClearCart />}
+
+            {repairPaid && (
+                <p className="card p-4 text-sm font-bold">Thanks! Your payment for repair {repairPaid.slice(0, 12)} went through. It can take a moment to show as paid.</p>
+            )}
 
             {placed && (
                 <p className="card p-4 text-sm font-bold">Order {placed.slice(0, 12)} placed! We will keep you posted by email and notifications.</p>

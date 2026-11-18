@@ -18,9 +18,9 @@ export default function TrendChart({ days }: { days: DayTotal[] }) {
                 {[0, 0.25, 0.5, 0.75, 1].map((t) => (
                     <line key={t} x1="0" x2={w} y1={h * t} y2={h * t} stroke="currentColor" strokeOpacity="0.1" />
                 ))}
-                <path d={`${shop} L${w} ${h} L0 ${h} Z`} fill="#8b3fc7" fillOpacity="0.15" />
-                <path d={shop} fill="none" stroke="#8b3fc7" strokeWidth="3" strokeLinejoin="round" />
-                <path d={repair} fill="none" stroke="#19b3c4" strokeWidth="3" strokeLinejoin="round" />
+                <path d={`${shop} L${w} ${h} L0 ${h} Z`} fill="var(--color-purple)" fillOpacity="0.15" />
+                <path d={shop} fill="none" stroke="var(--color-purple)" strokeWidth="3" strokeLinejoin="round" />
+                <path d={repair} fill="none" stroke="var(--color-teal)" strokeWidth="3" strokeLinejoin="round" />
             </svg>
             <div className="flex justify-between text-[10px] text-ink/50">
                 <span>{days[0]?.label}</span>

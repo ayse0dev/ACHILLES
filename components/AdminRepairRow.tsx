@@ -58,7 +58,7 @@ export default function AdminRepairRow({
                 />
             </div>
             <div className="space-y-2">
-                <button disabled={isPending} className="btn btn-ink !py-2 !px-5 text-xs uppercase">
+                <button disabled={isPending} className="btn btn-ink !py-2 !px-5 text-sm">
                     {isPending ? "Saving" : "Save"}
                 </button>
                 {state.success && <p className="text-xs font-bold text-purple">Saved & emailed</p>}

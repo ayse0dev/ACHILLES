@@ -10,10 +10,9 @@ import { addressLine, type Address } from "@/lib/addressTypes";
 type Payment = "online" | "banking" | "bank_transfer" | "cod";
 
 const PAYMENTS: { key: Payment; title: string; text: string }[] = [
-    { key: "online", title: "GCash, Maya or card", text: "Pay online through PayMongo." },
-    { key: "banking", title: "Online banking", text: "Pay directly from your bank app (BPI, UnionBank)." },
+    { key: "online", title: "GCash, Maya, card or online banking", text: "Pay securely online. You choose your method on the next page." },
     { key: "bank_transfer", title: "Bank transfer", text: "Send the amount to our bank account. We pack once confirmed." },
-    { key: "cod", title: "Cash on delivery", text: "Pay in cash when it arrives (orders up to ₱20,000)." },
+    { key: "cod", title: "Cash on delivery", text: "Pay in cash when it arrives. We call or message you to confirm first. First orders up to ₱3,000, otherwise up to ₱20,000." },
 ];
 
 export default function CheckoutForm({
@@ -143,7 +142,8 @@ export default function CheckoutForm({
     }
 
     return (
-        <div className="space-y-6">
+        <div className="grid lg:grid-cols-[1fr_400px] items-start [&_.card]:!rounded-none [&_.card]:!shadow-none [&_.card]:!border-0 [&_.card]:!bg-transparent [&_.card]:!p-8">
+            <div>
             <section className="card p-6 space-y-4">
                 <h2 className="font-display font-bold text-xl">1. Delivery address <span className="text-red text-sm">required</span></h2>
                 {home && (
@@ -184,12 +184,22 @@ export default function CheckoutForm({
             <section className="card p-6 space-y-3">
                 <h2 className="font-display font-bold text-xl">2. Contact number <span className="text-red text-sm">required</span></h2>
                 {profilePhone && (
-                    <label className="flex items-center gap-2 text-sm">
-                        <input type="checkbox" checked={sameNumber} onChange={(e) => setSameNumber(e.target.checked)} />
-                        Same as my profile number ({profilePhone})
-                    </label>
+                    <>
+                        <label className="flex gap-3 items-start text-sm">
+                            <input type="radio" name="contact" checked={sameNumber} onChange={() => setSameNumber(true)} className="mt-1" />
+                            <b>Same as my profile number ({profilePhone})</b>
+                        </label>
+                        <label className="flex gap-3 items-start text-sm">
+                            <input type="radio" name="contact" checked={!sameNumber} onChange={() => setSameNumber(false)} className="mt-1" />
+                            <b>Use a different number</b>
+                        </label>
+                    </>
                 )}
-                {!(sameNumber && profilePhone) && <PhoneInput value={phone} onChange={setPhone} />}
+                {!(sameNumber && profilePhone) && (
+                    <div className={profilePhone ? "pl-6" : ""}>
+                        <PhoneInput value={phone} onChange={setPhone} />
+                    </div>
+                )}
                 {!profilePhone && (
                     <p className="text-xs text-ink/60">Tip: save a number in <Link href="/profile" className="underline">Profile management</Link> to reuse it next time.</p>
                 )}
@@ -197,19 +207,17 @@ export default function CheckoutForm({
 
             <section className="card p-6 space-y-3">
                 <h2 className="font-display font-bold text-xl">3. Payment</h2>
-                {PAYMENTS.map((p) => (
+                {PAYMENTS.filter((p) => p.key !== "bank_transfer" || bankReady).map((p) => (
                     <label key={p.key} className="flex gap-3 items-start text-sm">
                         <input type="radio" name="pay" checked={payment === p.key} onChange={() => setPayment(p.key)} className="mt-1" />
                         <span>
                             <b>{p.title}</b>
                             <br />
                             <span className="text-ink/60">{p.text}</span>
-                            {p.key === "bank_transfer" && !bankReady && payment === p.key && (
-                                <span className="block text-xs text-ink/60">We will message you the bank details after you place the order.</span>
-                            )}
                         </span>
                     </label>
                 ))}
+                <p className="text-xs text-ink/60">You do not need to link a bank or e-wallet to your account. Online payments are handled securely at checkout.</p>
             </section>
 
             <section className="card p-6 space-y-3">
@@ -233,8 +241,24 @@ export default function CheckoutForm({
                 {voucherMsg && <p className={`text-xs font-bold ${voucher ? "text-teal" : "text-red"}`}>{voucherMsg}</p>}
             </section>
 
-            <section className="card p-6 space-y-3">
-                <div className="flex justify-between text-sm"><span>Subtotal</span><span>₱{subtotal.toFixed(2)}</span></div>
+            </div>
+
+            <aside className="card p-6 space-y-4 lg:sticky lg:top-4">
+                <h2 className="font-display font-bold text-xl">Your items</h2>
+                <ul className="space-y-3">
+                    {items.map((i) => (
+                        <li key={`${i.slug}-${i.size}`} className="flex gap-3 items-center text-sm">
+                            {i.image && <img src={i.image} alt="" className="w-14 h-14 rounded-xl object-cover bg-ink/5" />}
+                            <span className="flex-1">
+                                <b>{i.name}</b>
+                                <br />
+                                <span className="text-ink/60">Size {i.size} · Qty {i.qty}</span>
+                            </span>
+                            <span className="font-bold">₱{(i.price * i.qty).toFixed(2)}</span>
+                        </li>
+                    ))}
+                </ul>
+                <div className="flex justify-between text-sm pt-2"><span>Subtotal</span><span>₱{subtotal.toFixed(2)}</span></div>
                 {discount !== "none" && <div className="flex justify-between text-sm"><span>ID discount (20%)</span><span>−₱{(subtotal - afterId).toFixed(2)}</span></div>}
                 {voucher && <div className="flex justify-between text-sm"><span>Voucher {voucher.code}</span><span>−₱{voucher.off.toFixed(2)}</span></div>}
                 <div className="flex justify-between font-black text-2xl text-purple"><span>Total</span><span>₱{total.toFixed(2)}</span></div>
@@ -242,7 +266,7 @@ export default function CheckoutForm({
                 <button onClick={placeOrder} disabled={pending} className="btn btn-accent w-full">
                     {pending ? "Please wait..." : payment === "cod" || payment === "bank_transfer" ? "Place order" : "Continue to payment"}
                 </button>
-            </section>
+            </aside>
         </div>
     );
 }

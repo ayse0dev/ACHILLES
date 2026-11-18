@@ -5,7 +5,7 @@ import { base } from "@/lib/airtable";
 import { getCurrentUser } from "@/lib/session";
 import { getProductBySlug } from "@/lib/products";
 import { priceOf } from "@/lib/price";
-import { createCheckoutSession } from "@/lib/paymongo";
+import { createInvoice } from "@/lib/xendit";
 import { addressFields, findOwnedAddress, listAddresses } from "@/lib/addresses";
 import { addressLine, addressSchema } from "@/lib/addressTypes";
 import { normalizePhone } from "@/lib/phone";
@@ -14,11 +14,10 @@ import { newReference } from "@/lib/reference";
 import { sendEmail } from "@/lib/mail";
 import { notify } from "@/lib/notify";
 import { shopBank } from "@/lib/business";
+import { formulaString } from "@/lib/formula";
 
-const METHODS = {
-    online: ["gcash", "paymaya", "card"],
-    banking: ["dob", "dob_ubp"],
-} as const;
+const COD_MAX = 20000;
+const COD_FIRST_MAX = 3000;
 
 const schema = z.object({
     items: z
@@ -36,6 +35,16 @@ const schema = z.object({
 });
 
 export async function POST(request: Request) {
+    try {
+        return await handle(request);
+    } catch (err) {
+        const e = err as { message?: string; error?: string; statusCode?: number; stack?: string };
+        console.error(`[checkout] unexpected error: ${e?.message ?? ""} | ${e?.error ?? ""} | status ${e?.statusCode ?? ""}\n${e?.stack ?? String(err)}`);
+        return NextResponse.json({ error: "Something went wrong placing your order. Please try again." }, { status: 500 });
+    }
+}
+
+async function handle(request: Request) {
     if (!hit(`checkout:${ipFrom(request.headers)}`, 10, 60000)) {
         return NextResponse.json({ error: "Too many requests." }, { status: 429 });
     }
@@ -90,8 +99,32 @@ export async function POST(request: Request) {
     const totalCents = lines.reduce((s, l) => s + l.amount * l.quantity, 0);
     const total = totalCents / 100;
 
-    if (data.payment === "cod" && total > 20000) {
-        return NextResponse.json({ error: "Cash on delivery is limited to orders up to ₱20,000. Please choose another payment method." }, { status: 400 });
+    if (data.payment === "bank_transfer" && !shopBank.accountNumber) {
+        return NextResponse.json({ error: "Bank transfer is not available right now. Please pay with GCash, Maya, card or online banking." }, { status: 400 });
+    }
+
+    if (data.payment === "cod") {
+        if (total > COD_MAX) {
+            return NextResponse.json({ error: `Cash on delivery is limited to orders up to ₱${COD_MAX.toLocaleString("en-PH")}. Please choose another payment method.` }, { status: 400 });
+        }
+        const email = formulaString(user.email);
+        const [open, past] = await Promise.all([
+            base("Orders")
+                .select({
+                    filterByFormula: `AND({Email} = ${email}, {PaymentMethod} = "cod", OR({Status} = "Pending payment", {Status} = "Confirmed", {Status} = "Packed", {Status} = "Shipped"))`,
+                    maxRecords: 1,
+                })
+                .firstPage(),
+            base("Orders")
+                .select({ filterByFormula: `AND({Email} = ${email}, OR({Status} = "Delivered", {Status} = "Paid"))`, maxRecords: 1 })
+                .firstPage(),
+        ]);
+        if (open.length > 0) {
+            return NextResponse.json({ error: "You already have a cash-on-delivery order in progress. Please wait for it to be delivered, or pay online for this one." }, { status: 400 });
+        }
+        if (past.length === 0 && total > COD_FIRST_MAX) {
+            return NextResponse.json({ error: `For your first order, cash on delivery is limited to ₱${COD_FIRST_MAX.toLocaleString("en-PH")}. Please pay online or reduce your order.` }, { status: 400 });
+        }
     }
 
     if (data.newAddress && data.saveAddress) {
@@ -103,7 +136,8 @@ export async function POST(request: Request) {
 
     const reference = newReference("OR");
     const items = lines.map((l) => `${l.name} x${l.quantity}`).join(", ");
-    const status = data.payment === "cod" ? "Confirmed" : "Pending payment";
+    // COD orders stay "Pending payment" until staff verify them with the customer.
+    const status = "Pending payment";
 
     const record = await base("Orders").create({
         Reference: reference,
@@ -129,7 +163,7 @@ export async function POST(request: Request) {
         const bankText = shopBank.accountNumber
             ? `\n\nPlease send ₱${total.toFixed(2)} to ${shopBank.bank}, account name ${shopBank.accountName}, account number ${shopBank.accountNumber}, and use ${reference} as the reference.`
             : `\n\nWe will message you the bank details for your transfer of ₱${total.toFixed(2)}. Use ${reference} as the reference.`;
-        const how = data.payment === "cod" ? "You will pay in cash when your order arrives." : `Your order will be packed once we confirm your bank transfer.${bankText}`;
+        const how = data.payment === "cod" ? "You will pay in cash when your order arrives. Our team will contact you at this number to confirm your order before we pack it, so please keep your phone on." : `Your order will be packed once we confirm your bank transfer.${bankText}`;
         await sendEmail(
             user.email,
             "We received your ACHILLES order",
@@ -141,17 +175,17 @@ export async function POST(request: Request) {
 
     const origin = new URL(request.url).origin;
     try {
-        const session = await createCheckoutSession({
+        const session = await createInvoice({
+            reference,
             lines,
             email: user.email,
             successUrl: `${origin}/orders/${reference}?paid=1`,
-            cancelUrl: `${origin}/cart`,
-            methods: [...METHODS[data.payment]],
-            metadata: { email: user.email, orderId: record.id },
+            failureUrl: `${origin}/cart`,
         });
         return NextResponse.json({ url: session.url });
-    } catch {
-        await base("Orders").update(record.id, { Status: "Cancelled" });
+    } catch (err) {
+        console.error("[checkout] could not start payment:", err);
+        await base("Orders").update(record.id, { Status: "Cancelled" }).catch(() => null);
         return NextResponse.json({ error: "Payment could not be started. Please try again or choose another method." }, { status: 502 });
     }
 }

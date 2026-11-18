@@ -126,12 +126,12 @@ export default async function HomePage() {
 
             <section className="max-w-7xl mx-auto px-4 md:px-6 pt-16">
                 <h2 className="uppercase font-black text-2xl tracking-tight mb-6">Shop by category</h2>
-                <div className="grid grid-cols-2 lg:grid-cols-5 gap-4">
+                <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3">
                     {shopCategories.map((c, i) => (
                         <Link
                             key={c.label}
                             href={c.href}
-                            className="group relative aspect-[4/5] rounded-3xl overflow-hidden flex flex-col justify-end p-5 text-white"
+                            className="group relative aspect-square rounded-none overflow-hidden flex flex-col justify-end p-4 text-white"
                             style={{
                                 background: [
                                     "linear-gradient(160deg,#19b3c4,#1b1340)",
@@ -142,8 +142,8 @@ export default async function HomePage() {
                                 ][i % 5],
                             }}
                         >
-                            <span className="uppercase font-black text-xl tracking-tight group-hover:underline">{c.label}</span>
-                            <span className="text-xs text-white/85">{c.text}</span>
+                            <span className="uppercase font-black text-base leading-tight tracking-tight group-hover:underline">{c.label}</span>
+                            <span className="text-[11px] leading-snug text-white/85 line-clamp-3">{c.text}</span>
                         </Link>
                     ))}
                 </div>

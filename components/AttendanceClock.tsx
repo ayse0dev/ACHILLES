@@ -10,11 +10,11 @@ export default function AttendanceClock() {
 
     return (
         <form action={formAction} className="card p-5 flex flex-wrap items-center gap-3">
-            <p className="font-black uppercase mr-auto">My attendance</p>
-            <button name="mode" value="in" disabled={isPending} className="btn btn-accent !py-2 !px-5 text-xs uppercase">
+            <p className="font-semibold mr-auto">My attendance</p>
+            <button name="mode" value="in" disabled={isPending} className="btn btn-accent !py-2 !px-5 text-sm">
                 Clock in
             </button>
-            <button name="mode" value="out" disabled={isPending} className="btn btn-ink !py-2 !px-5 text-xs uppercase">
+            <button name="mode" value="out" disabled={isPending} className="btn btn-ink !py-2 !px-5 text-sm">
                 Clock out
             </button>
             {state.error && <p className="text-xs text-red w-full">{state.error}</p>}

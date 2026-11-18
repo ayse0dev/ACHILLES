@@ -18,7 +18,7 @@ export default function ProductGallery({ images, name }: { images: string[]; nam
                         onClick={() => setActive(i)}
                         aria-label={`Show view ${i + 1}`}
                         aria-pressed={active === i}
-                        className={`aspect-square rounded-xl overflow-hidden border-2 bg-[#f3f1ee] ${
+                        className={`aspect-square rounded-none overflow-hidden border-2 bg-[#f3f1ee] ${
                             active === i ? "border-ink" : "border-transparent"
                         }`}
                     >
@@ -30,7 +30,7 @@ export default function ProductGallery({ images, name }: { images: string[]; nam
                     </button>
                 ))}
             </div>
-            <div className="aspect-square rounded-3xl overflow-hidden bg-[#f3f1ee]">
+            <div className="aspect-square rounded-none overflow-hidden bg-[#f3f1ee]">
                 {current ? (
                     <img src={current} alt={name} className="w-full h-full object-contain p-6" />
                 ) : (

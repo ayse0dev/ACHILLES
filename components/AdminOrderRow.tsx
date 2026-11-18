@@ -46,6 +46,12 @@ export default function AdminOrderRow({
                 <p className="text-xs text-ink/60">{created} · ₱{total.toFixed(2)}{payment ? ` · ${payment.replace("_", " ")}` : ""}{voucher ? ` · voucher ${voucher}` : ""}</p>
                 {address && <p className="text-xs">Deliver to: {address}</p>}
                 {phone && <p className="text-xs">Contact: {phone}</p>}
+                {payment === "cod" && status === "Pending payment" && (
+                    <p className="text-xs font-bold text-red">COD: call or message {phone || "the customer"} to confirm this order is real, then set it to Confirmed.</p>
+                )}
+                {payment === "bank_transfer" && status === "Pending payment" && (
+                    <p className="text-xs font-bold text-red">Bank transfer: set to Paid only after the money shows in the bank account.</p>
+                )}
                 {lat !== undefined && lng !== undefined && (
                     <a href={`https://www.openstreetmap.org/?mlat=${lat}&mlon=${lng}#map=17/${lat}/${lng}`} target="_blank" rel="noreferrer" className="text-xs underline">View pin on map</a>
                 )}
@@ -59,7 +65,7 @@ export default function AdminOrderRow({
                 <input name="tracking" defaultValue={tracking} placeholder="Tracking number" className="field !py-2" />
             </div>
             <div className="space-y-2">
-                <button disabled={isPending} className="btn btn-ink !py-2 !px-5 text-xs uppercase">
+                <button disabled={isPending} className="btn btn-ink !py-2 !px-5 text-sm">
                     {isPending ? "Saving" : "Save"}
                 </button>
                 {state.success && <p className="text-xs font-bold text-purple">Saved</p>}

@@ -13,8 +13,8 @@ export default async function CheckoutPage() {
     const addresses = await listAddresses(user.email);
 
     return (
-        <div className="max-w-3xl mx-auto px-4 py-10 space-y-6">
-            <div>
+        <div className="w-full min-h-[calc(100vh-4rem)] bg-white pb-24 -mb-24">
+            <div className="px-8 pt-7">
                 <p className="eyebrow mb-2">Almost there</p>
                 <h1 className="page-title">Delivery & payment</h1>
             </div>

@@ -1,7 +1,8 @@
 import Link from "next/link";
 import { base } from "@/lib/airtable";
 import { formulaString } from "@/lib/formula";
-import { formatMoney, paymentLabel, PAID_STATUSES, REPAIR_DONE, repairPayment, repairServices } from "@/lib/receipt";
+import { formatMoney, paymentLabel, PAID_STATUSES, REPAIR_DONE, repairPaid, repairPayment, repairServices } from "@/lib/receipt";
+import PayRepairButton from "./PayRepairButton";
 
 type Fields = {
     Reference?: string;
@@ -45,6 +46,7 @@ type Row = {
     total: number | null;
     status: string;
     receipt: boolean;
+    canPay?: boolean;
 };
 
 export default async function TransactionHistory({ email, userId }: { email: string; userId: string }) {
@@ -102,6 +104,7 @@ export default async function TransactionHistory({ email, userId }: { email: str
                 total: quote > 0 ? quote : null,
                 status: r.fields.Status ?? "",
                 receipt: r.fields.Status === REPAIR_DONE && quote > 0,
+                canPay: quote > 0 && !repairPaid(issue) && r.fields.Status !== REPAIR_DONE,
             };
         }),
     ].sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());
@@ -168,7 +171,12 @@ export default async function TransactionHistory({ email, userId }: { email: str
                                             <a href={`/api/receipt/${r.reference}`} className="rounded-full bg-ink text-white px-4 py-2 hover:bg-purple transition">PDF</a>
                                         </>
                                     ) : r.kind === "Repair" ? (
-                                        <Link href="/track" className="underline">Track</Link>
+                                        <>
+                                            {r.canPay && <PayRepairButton reference={r.reference} />}
+                                            <Link href="/track" className="underline">Track</Link>
+                                        </>
+                                    ) : r.status === "Pending payment" && r.payment.startsWith("Cash") ? (
+                                        <span className="text-ink/40">Pay on delivery</span>
                                     ) : (
                                         <span className="text-ink/40">Not paid yet</span>
                                     )}

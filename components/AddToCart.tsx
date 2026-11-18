@@ -15,7 +15,8 @@ export default function AddToCart({
 
     function handleAdd() {
         if (!size) return;
-        add({ slug: product.slug, name: product.name, price: product.price, image: product.image, size });
+        const ok = add({ slug: product.slug, name: product.name, price: product.price, image: product.image, size });
+        if (!ok) return;
         setJustAdded(true);
         setTimeout(() => setJustAdded(false), 1500);
     }

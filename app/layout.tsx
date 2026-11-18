@@ -22,7 +22,7 @@ export default function RootLayout({
     return (
         <html lang="en" suppressHydrationWarning>
             <body>
-                <BackgroundArt />
+                <HideOnDashboard><BackgroundArt /></HideOnDashboard>
                 <Providers>
                     <HideOnDashboard><AnnouncementBar /></HideOnDashboard>
                     <Navbar />

@@ -118,8 +118,8 @@ export default function LiveInbox() {
                     >
                         <p className="flex items-center justify-between gap-2">
                             <span className="font-bold text-sm truncate">{i.name}</span>
-                            {i.waiting && !i.closed && <span className="text-[10px] font-black uppercase bg-orange text-white rounded-full px-2">Waiting</span>}
-                            {i.closed && <span className="text-[10px] uppercase text-ink/50">Ended</span>}
+                            {i.waiting && !i.closed && <span className="text-[10px] font-semibold bg-orange text-white rounded px-2">Waiting</span>}
+                            {i.closed && <span className="text-[10px] text-ink/50">Ended</span>}
                         </p>
                         <p className="text-xs text-ink/60 truncate">{i.lastBody}</p>
                         <p className="text-[10px] text-ink/40">{ago(i.lastAt)}</p>

@@ -1,10 +1,22 @@
 "use client";
 
 import Link from "next/link";
+import { useSession } from "next-auth/react";
 import { useCart } from "@/components/CartProvider";
 
 export default function CartPage() {
     const { items, subtotal, setQty, remove, clear } = useCart();
+    const { data: session, status } = useSession();
+
+    if (status !== "loading" && !session?.user) {
+        return (
+            <div className="max-w-xl mx-auto px-4 py-20 text-center space-y-6">
+                <p className="eyebrow">Your cart</p>
+                <h1 className="page-title">Log in to see your cart</h1>
+                <Link href="/login?callbackUrl=/cart" className="btn btn-ink">Log in</Link>
+            </div>
+        );
+    }
 
     if (items.length === 0) {
         return (

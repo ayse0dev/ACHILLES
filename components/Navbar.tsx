@@ -61,7 +61,7 @@ export default function Navbar() {
 
                 <div className="flex items-center gap-3 text-sm shrink-0">
                     {status !== "loading" && session?.user && !isAdminUser && <NotificationBell />}
-                    {!isAdminUser && (
+                    {status !== "loading" && session?.user && !isAdminUser && (
                         <Link
                             href="/cart"
                             className="relative w-10 h-10 rounded-full border-2 border-ink flex items-center justify-center hover:bg-ink/5"

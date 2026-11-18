@@ -88,28 +88,28 @@ export default async function DashboardView({ mode, tab = "overview" }: { mode: 
     const count = (rows: readonly { fields: object }[], key: string, values: string[]) =>
         rows.filter((r) => values.includes(String((r.fields as Record<string, unknown>)[key]))).length;
     const goals = [
-        { label: "Orders delivered", done: count(orderRecords, "Status", ["Delivered"]), total: orderRecords.length, color: "bg-purple" },
-        { label: "Repairs completed", done: count(repairRecords, "Status", ["Completed"]), total: repairRecords.length, color: "bg-teal" },
-        { label: "Tickets resolved", done: count(ticketRecords, "Status", ["Resolved"]), total: ticketRecords.length, color: "bg-orange" },
-        { label: "Products well stocked", done: productRecords.length - lowStock.length, total: productRecords.length, color: "bg-yellow" },
+        { label: "Orders delivered", done: count(orderRecords, "Status", ["Delivered"]), total: orderRecords.length, color: "bg-ink" },
+        { label: "Repairs completed", done: count(repairRecords, "Status", ["Completed"]), total: repairRecords.length, color: "bg-ink" },
+        { label: "Tickets resolved", done: count(ticketRecords, "Status", ["Resolved"]), total: ticketRecords.length, color: "bg-ink" },
+        { label: "Products well stocked", done: productRecords.length - lowStock.length, total: productRecords.length, color: "bg-ink" },
     ];
 
     return (
-        <div className="max-w-7xl mx-auto px-4 md:px-6 py-8 grid lg:grid-cols-[220px_1fr] gap-6 items-start">
+        <div className="admin-ui min-h-[calc(100vh-4rem)] bg-[#f6f7f9]">
+        <div className="max-w-7xl mx-auto px-4 md:px-6 py-8 grid lg:grid-cols-[210px_1fr] gap-8 items-start">
             <AutoRefresh seconds={20} />
-            <aside className="bg-ink text-white rounded-3xl p-4 lg:sticky lg:top-24 space-y-4">
-                <div className="px-2 pt-2">
-                    <p className="font-black uppercase tracking-wide">{admin ? "Admin" : "Staff"}</p>
-                    <p className="text-xs text-white/60 truncate">{user.email}</p>
-                    <p className="text-xs mt-1 flex items-center gap-1"><span className="w-2 h-2 rounded-full bg-teal inline-block" />Live data</p>
+            <aside className="bg-white border border-ink/10 rounded-lg p-3 lg:sticky lg:top-24 space-y-3">
+                <div className="px-2 pt-1 pb-3 border-b border-ink/10">
+                    <p className="text-sm font-semibold">{admin ? "Admin" : "Staff"}</p>
+                    <p className="text-xs text-ink/60 truncate">{user.email}</p>
                 </div>
-                <nav className="flex lg:flex-col gap-1 overflow-x-auto">
+                <nav className="flex lg:flex-col gap-0.5 overflow-x-auto">
                     {tabs.map((t) => (
                         <Link
                             key={t.key}
                             href={`/${mode}?tab=${t.key}`}
-                            className={`px-3 py-2 rounded-xl text-sm font-bold whitespace-nowrap transition ${
-                                activeTab === t.key ? "bg-teal text-ink" : "text-white/70 hover:bg-white/10"
+                            className={`px-3 py-2 rounded-md text-sm whitespace-nowrap transition ${
+                                activeTab === t.key ? "bg-ink text-white font-medium" : "text-ink/70 hover:bg-ink/5"
                             }`}
                             aria-current={activeTab === t.key ? "page" : undefined}
                         >
@@ -121,40 +121,37 @@ export default async function DashboardView({ mode, tab = "overview" }: { mode: 
 
             <div className="space-y-6 min-w-0">
             <div>
-                <h1 className="uppercase font-black text-3xl tracking-tight">{tabs.find((t) => t.key === activeTab)?.label}</h1>
-                <p className="text-xs text-ink/60">Updates automatically every 20 seconds.</p>
+                <h1 className="text-2xl font-semibold tracking-tight">{tabs.find((t) => t.key === activeTab)?.label}</h1>
+                <p className="text-xs text-ink/50">Refreshes automatically every 20 seconds.</p>
             </div>
 
             {activeTab === "overview" && (
                 <section className="space-y-6">
                     <div className="grid sm:grid-cols-2 xl:grid-cols-4 gap-4">
                         {[
-                            { glyph: "₱", color: "bg-purple", value: `₱${(shopTotal + repairTotal).toLocaleString("en-US", { maximumFractionDigits: 0 })}`, label: "Total money in" },
-                            { glyph: "⚒", color: "bg-teal", value: String(openRepairs), label: "Open repairs" },
-                            { glyph: "▣", color: "bg-orange", value: String(toShip.length), label: "Orders to pack or ship" },
-                            { glyph: "✉", color: "bg-red", value: String(openTickets), label: "Open tickets" },
+                            { value: `₱${(shopTotal + repairTotal).toLocaleString("en-US", { maximumFractionDigits: 0 })}`, label: "Total money in" },
+                            { value: String(openRepairs), label: "Open repairs" },
+                            { value: String(toShip.length), label: "Orders to pack or ship" },
+                            { value: String(openTickets), label: "Open tickets" },
                         ].map((s) => (
-                            <div key={s.label} className="bg-ink text-white rounded-2xl p-5 flex items-center gap-4">
-                                <span className={`${s.color} w-14 h-14 rounded-full flex items-center justify-center text-2xl font-black shrink-0`}>{s.glyph}</span>
-                                <div className="min-w-0">
-                                    <p className="text-2xl font-black truncate">{s.value}</p>
-                                    <p className="text-xs uppercase tracking-wide text-white/60">{s.label}</p>
-                                </div>
+                            <div key={s.label} className="card p-5">
+                                <p className="text-xs text-ink/60">{s.label}</p>
+                                <p className="text-2xl font-semibold mt-1 truncate">{s.value}</p>
                             </div>
                         ))}
                     </div>
 
                     <div className="grid xl:grid-cols-[2fr_1fr] gap-4">
                         <div className="card p-6 space-y-3">
-                            <h2 className="font-black uppercase">Money in, last 14 days</h2>
+                            <h2 className="font-semibold text-sm">Money in, last 14 days</h2>
                             <TrendChart days={days} />
                         </div>
                         <div className="card p-6 space-y-4">
-                            <h2 className="font-black uppercase">Goal completion</h2>
+                            <h2 className="font-semibold text-sm">Goal completion</h2>
                             {goals.map((g) => (
                                 <div key={g.label} className="space-y-1">
                                     <div className="flex justify-between text-xs font-bold"><span>{g.label}</span><span>{g.done}/{g.total}</span></div>
-                                    <div className="h-2 rounded-full bg-ink/10 overflow-hidden">
+                                    <div className="h-1.5 rounded-sm bg-ink/10 overflow-hidden">
                                         <div className={`h-full ${g.color}`} style={{ width: `${g.total ? Math.round((g.done / g.total) * 100) : 0}%` }} />
                                     </div>
                                 </div>
@@ -166,7 +163,7 @@ export default async function DashboardView({ mode, tab = "overview" }: { mode: 
 
                     <div className="grid lg:grid-cols-3 gap-4">
                         <div className="card p-5 space-y-3">
-                            <h2 className="font-black uppercase">Recent orders</h2>
+                            <h2 className="font-semibold text-sm">Recent orders</h2>
                             {orderRecords.slice(0, 5).map((o) => {
                                 const f = o.fields as { Reference?: string; Email?: string; Total?: number; Status?: string };
                                 return (
@@ -179,7 +176,7 @@ export default async function DashboardView({ mode, tab = "overview" }: { mode: 
                             {orderRecords.length === 0 && <p className="text-sm text-ink/60">No orders yet.</p>}
                         </div>
                         <div className="card p-5 space-y-3">
-                            <h2 className="font-black uppercase">Recent repairs</h2>
+                            <h2 className="font-semibold text-sm">Recent repairs</h2>
                             {repairRecords.slice(0, 5).map((r) => {
                                 const f = r.fields as { Reference?: string; ShoeDescription?: string; Status?: string };
                                 return (
@@ -192,7 +189,7 @@ export default async function DashboardView({ mode, tab = "overview" }: { mode: 
                             {repairRecords.length === 0 && <p className="text-sm text-ink/60">No repairs yet.</p>}
                         </div>
                         <div className="card p-5 space-y-3">
-                            <h2 className="font-black uppercase">Low stock</h2>
+                            <h2 className="font-semibold text-sm">Low stock</h2>
                             {lowStock.length === 0 ? (
                                 <p className="text-ink/60 text-sm">Nothing is running low.</p>
                             ) : (
@@ -289,7 +286,7 @@ export default async function DashboardView({ mode, tab = "overview" }: { mode: 
             {activeTab === "stock" && (
                 <section className="space-y-8">
                     <div className="space-y-4">
-                        <h2 className="font-black uppercase text-xl">Current stock</h2>
+                        <h2 className="font-semibold text-base">Current stock</h2>
                         {productRecords.length === 0 && <p className="text-ink/60">No products in Airtable yet.</p>}
                         {productRecords.map((p) => {
                             const f = p.fields as { Name?: string; Slug?: string; Stock?: number };
@@ -304,7 +301,7 @@ export default async function DashboardView({ mode, tab = "overview" }: { mode: 
                         })}
                     </div>
                     <div className="space-y-3">
-                        <h2 className="font-black uppercase text-xl">Stock-in history</h2>
+                        <h2 className="font-semibold text-base">Stock-in history</h2>
                         {intakeRecords.length === 0 && <p className="text-ink/60 text-sm">No stock movements logged yet.</p>}
                         <ul className="card divide-y divide-ink/10">
                             {intakeRecords.map((i) => {
@@ -351,10 +348,10 @@ export default async function DashboardView({ mode, tab = "overview" }: { mode: 
             {activeTab === "analytics" && admin && (
                 <section className="grid sm:grid-cols-2 lg:grid-cols-4 gap-4">
                     <MoneyFlow days={days} shopTotal={shopTotal} repairTotal={repairTotal} />
-                    <div className="card p-6"><p className="text-xs uppercase font-bold text-ink/60">Average order</p><p className="text-3xl font-black">₱{(orderRows.length ? shopTotal / orderRows.length : 0).toFixed(2)}</p></div>
-                    <div className="card p-6"><p className="text-xs uppercase font-bold text-ink/60">Buyers</p><p className="text-3xl font-black">{buyers.length}</p></div>
-                    <div className="card p-6"><p className="text-xs uppercase font-bold text-ink/60">Repair requests</p><p className="text-3xl font-black">{repairRecords.length}</p></div>
-                    <div className="card p-6"><p className="text-xs uppercase font-bold text-ink/60">Completed repairs</p><p className="text-3xl font-black">{repairRows.length}</p></div>
+                    <div className="card p-6"><p className="text-xs text-ink/60">Average order</p><p className="text-2xl font-semibold">₱{(orderRows.length ? shopTotal / orderRows.length : 0).toFixed(2)}</p></div>
+                    <div className="card p-6"><p className="text-xs text-ink/60">Buyers</p><p className="text-2xl font-semibold">{buyers.length}</p></div>
+                    <div className="card p-6"><p className="text-xs text-ink/60">Repair requests</p><p className="text-2xl font-semibold">{repairRecords.length}</p></div>
+                    <div className="card p-6"><p className="text-xs text-ink/60">Completed repairs</p><p className="text-2xl font-semibold">{repairRows.length}</p></div>
                 </section>
             )}
 
@@ -367,8 +364,8 @@ export default async function DashboardView({ mode, tab = "overview" }: { mode: 
                             <li key={b.email} className="p-4 flex flex-wrap justify-between gap-2 text-sm">
                                 <span className="font-bold">{shownEmail(b.email)}</span>
                                 <span>{b.orders} orders</span>
-                                <span className="font-black text-purple">₱{b.spent.toFixed(2)}</span>
-                                <span className="text-xs font-bold uppercase px-3 py-1 rounded-full bg-ink/10">{b.tier}</span>
+                                <span className="font-semibold">₱{b.spent.toFixed(2)}</span>
+                                <span className="text-xs px-2 py-0.5 rounded bg-ink/5">{b.tier}</span>
                             </li>
                         ))}
                     </ul>
@@ -397,25 +394,48 @@ export default async function DashboardView({ mode, tab = "overview" }: { mode: 
 
             {activeTab === "users" && admin && (
                 <section className="space-y-4">
-                    <h2 className="font-black uppercase">Create a staff account</h2>
+                    <h2 className="font-semibold text-sm">Create a staff account</h2>
                     <CreateAccountForm />
                     <p className="text-sm text-ink/70">Change what each account can access. Admins can manage everything, staff can run orders, repairs and stock.</p>
-                    {userRecords.map((u) => {
-                        const f = u.fields as { Name?: string; Email?: string; Role?: string };
+                    {(() => {
+                        const roleOf = (u: { fields: object }) => String((u.fields as { Role?: string }).Role ?? "customer").toLowerCase();
+                        const admins = userRecords.filter((u) => roleOf(u) === "admin");
+                        const others = userRecords.filter((u) => roleOf(u) !== "admin");
+                        const renderRow = (u: (typeof userRecords)[number]) => {
+                            const f = u.fields as { Name?: string; Email?: string; Role?: string };
+                            return (
+                                <AdminUserRow
+                                    key={`${u.id}-${f.Role ?? ""}`}
+                                    id={u.id}
+                                    name={f.Name ?? ""}
+                                    email={shownEmail(f.Email ?? "")}
+                                    role={(f.Role ?? "customer").toLowerCase()}
+                                    isSelf={u.id === user.id}
+                                />
+                            );
+                        };
                         return (
-                            <AdminUserRow
-                                key={`${u.id}-${f.Role ?? ""}`}
-                                id={u.id}
-                                name={f.Name ?? ""}
-                                email={shownEmail(f.Email ?? "")}
-                                role={(f.Role ?? "customer").toLowerCase()}
-                                isSelf={u.id === user.id}
-                            />
+                            <>
+                                {admins.length > 0 && (
+                                    <div className="space-y-2">
+                                        <p className="text-xs font-medium text-ink/50">Administrators (permanent)</p>
+                                        {admins.map(renderRow)}
+                                    </div>
+                                )}
+                                {admins.length > 0 && others.length > 0 && <hr className="border-ink/15" />}
+                                {others.length > 0 && (
+                                    <div className="space-y-2">
+                                        <p className="text-xs font-medium text-ink/50">Staff and customers</p>
+                                        {others.map(renderRow)}
+                                    </div>
+                                )}
+                            </>
                         );
-                    })}
+                    })()}
                 </section>
             )}
             </div>
+        </div>
         </div>
     );
 }

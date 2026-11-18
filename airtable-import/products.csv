@@ -10,7 +10,7 @@ Boardroom Black Oxford,boardroom-black-oxford,3690,,"6,7,8,9,10,11,12",/api/art/
 Gentleman Derby,gentleman-derby,3290,2629,"6,7,8,9,10,11,12",/api/art/product?kind=oxford&a=19b3c4&b=ffffff,Open-lacing derby with a comfortable fit.,22,Men,
 Heritage Loafer,heritage-loafer,2990,,"6,7,8,9,10,11,12",/api/art/product?kind=oxford&a=7ad39a&b=1b1340,Slip-on leather loafer for smart casual wear.,9,Men,
 Wedding Day Oxford,wedding-day-oxford,3990,,"6,7,8,9,10,11,12",/api/art/product?kind=oxford&a=c9ced8&b=e8374f,Dress shoe with a mirror-shine toe.,16,Men,
-Tassel Loafer Tan,tassel-loafer-tan,3190,,"6,7,8,9,10,11,12",/api/art/product?kind=oxford&a=8b3fc7&b=ffc83d,Classic tassel loafer in warm tan leather.,23,Men,
+Tassel Loafer Tan,tassel-loafer-tan,3190,,"6,7,8,9,10,11,12","/products/tassel-loafer-tan-1.png,/products/tassel-loafer-tan-2.png,/products/tassel-loafer-tan-3.png,/products/tassel-loafer-tan-4.png",Classic tassel loafer in warm tan leather.,23,Men,
 Trail Work Boot,trail-work-boot,4290,,"6,7,8,9,10,11,12",/api/art/product?kind=boot&a=ffc83d&b=1b1340,Rugged leather boot with a grippy outsole.,10,Men,
 Chelsea Boot Dark,chelsea-boot-dark,3890,,"6,7,8,9,10,11,12",/api/art/product?kind=boot&a=2f7d5b&b=ffc83d,Pull-on Chelsea boot with elastic side panels.,17,Men,
 Desert Ankle Boot,desert-ankle-boot,3590,2869,"6,7,8,9,10,11,12",/api/art/product?kind=boot&a=e8374f&b=1b1340,Soft suede-look ankle boot for weekends.,24,Men,
@@ -25,7 +25,7 @@ Gala Party Heel,gala-party-heel,3190,,"5,6,7,8,9,10",/api/art/product?kind=heel&
 Cloud Step Sneaker,cloud-step-sneaker,2590,,"5,6,7,8,9,10",/api/art/product?kind=sneaker&a=7ad39a&b=1b1340,Light sneaker with a bouncy midsole.,7,Women,
 Pastel Platform Sneaker,pastel-platform-sneaker,2890,,"5,6,7,8,9,10",/api/art/product?kind=sneaker&a=c9ced8&b=e8374f,Platform sneaker with a retro look.,14,Women,
 Everyday Slim Trainer,everyday-slim-trainer,2190,,"5,6,7,8,9,10",/api/art/product?kind=sneaker&a=8b3fc7&b=ffc83d,Slim trainer for work and weekends.,21,Women,
-Blush High-Top,blush-high-top,2790,2229,"5,6,7,8,9,10",/api/art/product?kind=sneaker&a=ffc83d&b=1b1340,High-top sneaker in a soft blush tone.,8,Women,
+Blush High-Top,blush-high-top,2790,2229,"5,6,7,8,9,10","/products/blush-high-top-1.png,/products/blush-high-top-2.png,/products/blush-high-top-3.png,/products/blush-high-top-4.png",High-top sneaker in a soft blush tone.,8,Women,
 Studio Flex Trainer,studio-flex-trainer,2490,,"5,6,7,8,9,10",/api/art/product?kind=sneaker&a=2f7d5b&b=ffc83d,Flexible trainer for dance and fitness.,2,Women,
 Sunny Strap Sandal,sunny-strap-sandal,1490,,"5,6,7,8,9,10",/api/art/product?kind=sandal&a=e8374f&b=1b1340,Easy strap sandal for the summer.,22,Women,New
 Beach Day Slide,beach-day-slide,990,,"5,6,7,8,9,10",/api/art/product?kind=sandal&a=6b8be8&b=ffffff,Soft slide for the beach and pool.,9,Women,
@@ -34,7 +34,7 @@ Fiesta Gladiator,fiesta-gladiator,1690,,"5,6,7,8,9,10",/api/art/product?kind=san
 Comfort Walk Sandal,comfort-walk-sandal,1590,1269,"5,6,7,8,9,10",/api/art/product?kind=sandal&a=3a2a4a&b=19b3c4,Arch-support sandal for long walks.,10,Women,
 Canvas Slip-On Sky,canvas-slip-on-sky,1290,,"5,6,7,8,9,10",/api/art/product?kind=slipon&a=ff7a3d&b=1b1340,Lightweight canvas slip-on with elastic sides.,17,Women,
 Ballet Flat Cream,ballet-flat-cream,1490,,"5,6,7,8,9,10",/api/art/product?kind=slipon&a=1b1340&b=ff7a3d,Soft ballet flat for daily wear.,24,Women,
-Weekend Loafer Flat,weekend-loafer-flat,1790,,"5,6,7,8,9,10",/api/art/product?kind=slipon&a=f4a9b8&b=8b3fc7,Casual loafer flat with a padded insole.,11,Women,Back in stock
+Weekend Loafer Flat,weekend-loafer-flat,1790,,"5,6,7,8,9,10","/products/weekend-loafer-flat-1.png,/products/weekend-loafer-flat-2.png,/products/weekend-loafer-flat-3.png",Casual loafer flat with a padded insole.,11,Women,Back in stock
 Bow Mary Jane,bow-mary-jane,1890,,"5,6,7,8,9,10",/api/art/product?kind=slipon&a=19b3c4&b=ffffff,Mary Jane flat with a cute bow.,18,Women,
 Little Zoom Sneaker,little-zoom-sneaker,1590,,"10,11,12,13,1,2,3",/api/art/product?kind=sneaker&a=7ad39a&b=1b1340,Easy velcro sneaker for active kids.,25,Kids,
 School Run Trainer,school-run-trainer,1790,1429,"10,11,12,13,1,2,3",/api/art/product?kind=sneaker&a=c9ced8&b=e8374f,Durable trainer for the school playground.,2,Kids,
@@ -65,4 +65,4 @@ Shoe Deodorizer Pack,shoe-deodorizer-pack,260,209,One size,/api/art/product?kind
 Complete Care Kit,complete-care-kit,890,,One size,/api/art/product?kind=cleaning&a=f4a9b8&b=8b3fc7,"Brush, cleaner, polish and cloth in one box.",7,Cleaning,Back in stock
 Cedar Shoe Tree,cedar-shoe-tree,650,,One size,/api/art/product?kind=cleaning&a=19b3c4&b=ffffff,Cedar shoe tree that absorbs moisture.,14,Cleaning,
 Microfiber Polish Cloth,microfiber-polish-cloth,120,,One size,/api/art/product?kind=cleaning&a=7ad39a&b=1b1340,Soft cloth for buffing and drying.,21,Cleaning,
-Insole Cushion Pair,insole-cushion-pair,320,,One size,/api/art/product?kind=cleaning&a=c9ced8&b=e8374f,Comfort insole with arch support.,8,Cleaning,
+Insole Cushion Pair,insole-cushion-pair,320,,One size,"/products/insole-cushion-pair-1.png,/products/insole-cushion-pair-2.png",Comfort insole with arch support.,8,Cleaning,

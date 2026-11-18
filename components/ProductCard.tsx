@@ -13,24 +13,24 @@ export default function ProductCard({ product, showPrice = true }: { product: Pr
 
     return (
         <Link href={`/shop/${product.slug}`} className="group block">
-            <div className="relative aspect-square rounded-3xl overflow-hidden bg-[#f3f1ee] group-hover:scale-[1.02] transition duration-500">
+            <div className="relative aspect-square rounded-none overflow-hidden bg-[#f3f1ee] group-hover:scale-[1.02] transition duration-500">
                 {photo ? (
                     <img src={photo} alt={product.name} className="w-full h-full object-contain p-4" />
                 ) : (
                     <ProductArt name={product.name} />
                 )}
                 {soldOut && (
-                    <span className="absolute top-3 left-3 bg-ink text-white text-[10px] font-bold uppercase tracking-wider px-3 py-1 rounded-full">
+                    <span className="absolute top-3 left-3 bg-ink text-white text-[10px] font-bold uppercase tracking-wider px-3 py-1 rounded-none">
                         Sold out
                     </span>
                 )}
                 {!soldOut && !lowStock && (onSale || product.badge) && (
-                    <span className="absolute top-3 left-3 bg-red text-white text-[10px] font-bold uppercase tracking-wider px-3 py-1 rounded-full">
+                    <span className="absolute top-3 left-3 bg-red text-white text-[10px] font-bold uppercase tracking-wider px-3 py-1 rounded-none">
                         {onSale ? `${off}% off` : product.badge}
                     </span>
                 )}
                 {lowStock && (
-                    <span className="absolute top-3 left-3 bg-orange text-white text-[10px] font-bold uppercase tracking-wider px-3 py-1 rounded-full">
+                    <span className="absolute top-3 left-3 bg-orange text-white text-[10px] font-bold uppercase tracking-wider px-3 py-1 rounded-none">
                         Only {product.stock} left
                     </span>
                 )}

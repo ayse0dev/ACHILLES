@@ -48,8 +48,9 @@ type Fields = {
 };
 
 export function paymentLabel(method: string): string {
-    if (method === "online") return "GCash / Maya / Card (PayMongo)";
-    if (method === "banking") return "Online banking (PayMongo)";
+    if (method === "online") return "GCash / Maya / Card";
+    if (method === "banking") return "Online payment";
+    if (method === "Paid online") return "GCash / Maya / Card / Online payment";
     if (method === "bank_transfer") return "Bank transfer";
     if (method === "cod") return "Cash on delivery";
     return method || "Online payment";
@@ -103,7 +104,13 @@ export function repairServices(issue: string): string[] {
     return m ? m[1].split(/;\s*/).filter(Boolean) : [];
 }
 
+export function repairPaid(issue: string): { amount: number; ref: string } | null {
+    const m = /^Paid online:\s*([\d.]+)\s*\|\s*(\S+)/m.exec(issue);
+    return m ? { amount: Number(m[1]), ref: m[2] } : null;
+}
+
 export function repairPayment(issue: string): string {
+    if (repairPaid(issue)) return "Paid online";
     const m = /^Payment preference:\s*(.+)$/m.exec(issue);
     return m ? m[1].trim() : "Paid at the shop";
 }
@@ -130,7 +137,7 @@ async function loadRepairReceipt(reference: string, viewer: { email: string; rol
         createdAt: f.SubmittedAt ?? "",
         status: f.Status ?? "",
         paymentMethod: repairPayment(issue),
-        paymentRef: "",
+        paymentRef: repairPaid(issue)?.ref ?? "",
         discount: "",
         voucher: "",
         voucherOff: 0,

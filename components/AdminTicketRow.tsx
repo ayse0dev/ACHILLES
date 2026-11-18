@@ -45,7 +45,7 @@ export default function AdminTicketRow({
                 <textarea name="reply" defaultValue={reply} placeholder="Reply to the customer" rows={3} className="field !py-2" />
             </div>
             <div className="space-y-2">
-                <button disabled={isPending} className="btn btn-ink !py-2 !px-5 text-xs uppercase">
+                <button disabled={isPending} className="btn btn-ink !py-2 !px-5 text-sm">
                     {isPending ? "Saving" : "Save"}
                 </button>
                 {state.success && <p className="text-xs font-bold text-purple">Saved</p>}
