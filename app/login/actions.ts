@@ -75,7 +75,8 @@ export async function requestLoginCode(
 
     try {
         await sendOtpEmail(profile.Email, code);
-    } catch {
+    } catch (err) {
+        console.error("[login] could not send the code email:", err instanceof Error ? `${err.name}: ${err.message}` : String(err));
         return { error: "We couldn't send the code email. Please try again." };
     }
 

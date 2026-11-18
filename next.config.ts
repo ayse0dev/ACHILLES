@@ -28,6 +28,8 @@ const securityHeaders = [
 
 const nextConfig: NextConfig = {
   poweredByHeader: false,
+  // The email logo is read from disk at send time, so make sure it ships with every server route.
+  outputFileTracingIncludes: { "/*": ["./public/logo-email.png"] },
   async headers() {
     return [{ source: "/:path*", headers: securityHeaders }];
   },
