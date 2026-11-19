@@ -17,7 +17,7 @@ export async function GET(req: Request, ctx: { params: Promise<{ reference: stri
 
     let logo: Uint8Array | null = null;
     try {
-        const res = await fetch(new URL("/logo.png", req.url));
+        const res = await fetch(new URL("/logo-white.png", req.url));
         if (res.ok) logo = new Uint8Array(await res.arrayBuffer());
     } catch {
         logo = null;

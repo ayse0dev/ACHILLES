@@ -9,13 +9,13 @@ import { contact, trustPoints, shopCategories } from "@/lib/business";
 
 export const dynamic = "force-dynamic";
 
-const features = [
-    { href: "/shop", title: "Shoes", text: "Browse and filter the collection." },
-    { href: "/repair", title: "Repairs", text: "Soles, heels, stitching and more." },
-    { href: "/book", title: "Book a drop-off", text: "Choose a time that suits you." },
-    { href: "/track", title: "Track", text: "Follow a repair, order or ticket with its reference number." },
-    { href: "/wishlist", title: "Wishlist", text: "Save the pairs you want next." },
-    { href: "/reviews", title: "Reviews", text: "Read what customers say about their repairs." },
+const features: { href: string; title: string; text: string; image: string; fit: "cover" | "contain" }[] = [
+    { href: "/shop", title: "Shoes", text: "Browse and filter the collection.", image: "/hero/shoe.png", fit: "contain" },
+    { href: "/repair", title: "Repairs", text: "Soles, heels, stitching and more.", image: "/before-after/sneaker-after.jpg", fit: "cover" },
+    { href: "/book", title: "Book a drop-off", text: "Choose a time that suits you.", image: "/before-after/loafer-before.jpg", fit: "cover" },
+    { href: "/track", title: "Track", text: "Follow a repair, order or ticket with its reference number.", image: "/before-after/derby-after.jpg", fit: "cover" },
+    { href: "/wishlist", title: "Wishlist", text: "Save the pairs you want next.", image: "/products/blush-high-top-1.png", fit: "contain" },
+    { href: "/reviews", title: "Reviews", text: "Read what customers say about their repairs.", image: "/before-after/sandal-after.jpg", fit: "cover" },
 ];
 
 export default async function HomePage() {

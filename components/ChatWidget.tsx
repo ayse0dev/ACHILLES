@@ -87,7 +87,7 @@ export default function ChatWidget() {
                 >
                     <AkiloMascot className="w-full h-auto drop-shadow-lg" />
                 </button>
-                <AkiloBranch className="pointer-events-none absolute bottom-0 right-0 w-56 h-auto" />
+                <AkiloBranch className={`pointer-events-none absolute bottom-0 right-0 w-56 h-auto ${open ? "akilo-branch-out" : ""}`} />
             </div>
 
             {open && (

@@ -1,5 +1,6 @@
 "use client";
 
+import Link from "next/link";
 import { useActionState } from "react";
 import { changePassword, AccountState } from "@/app/account/actions";
 
@@ -18,6 +19,7 @@ export default function PasswordForm() {
             <button disabled={isPending} className="btn btn-ink">
                 {isPending ? "Saving..." : "Update password"}
             </button>
+            <p className="text-xs text-ink/60">Forgot your current password? <Link href="/forgot" className="underline font-bold">Reset it by email</Link>.</p>
         </form>
     );
 }

@@ -288,7 +288,7 @@ body {
   0%, 92%, 100% { transform: scaleY(1); }
   96% { transform: scaleY(0.1); }
 }
-.akilo-body { transform: translateX(46%); animation: akilo-peek 7s ease-in-out infinite; transition: transform 0.5s ease-out; }
+.akilo-body { transform: translateX(46%); animation: akilo-peek 7s ease-in-out infinite; transition: transform 0.6s cubic-bezier(0.34, 1.56, 0.64, 1); }
 .group:hover .akilo-body, .group:focus-within .akilo-body, .akilo-out { transform: translateX(0); animation: none; }
 .akilo-arm { transform-box: view-box; }
 .group:hover .akilo-arm, .group:focus-within .akilo-arm { animation: akilo-wave 0.7s ease-in-out infinite; }
@@ -356,3 +356,46 @@ body {
 .admin-ui .btn-ghost:hover:not(:disabled) { background: #f3f4f6; }
 .admin-ui .btn-accent { background: #111827; color: #fff; }
 .admin-ui .btn-accent:hover:not(:disabled) { background: #374151; }
+
+/* Akilo: soft idle motion so he never looks stiff, and the branch moves with him. */
+.akilo-part { transform-box: view-box; }
+@keyframes akilo-breathe { 0%, 100% { transform: scaleY(1) scaleX(1); } 50% { transform: scaleY(1.03) scaleX(0.99); } }
+@keyframes akilo-head-sway {
+  0%, 100% { transform: rotate(0deg) translateY(0); }
+  22% { transform: rotate(-3.5deg) translateY(-1px); }
+  50% { transform: rotate(2.5deg) translateY(1px); }
+  76% { transform: rotate(-1.5deg) translateY(0); }
+}
+@keyframes akilo-tail-sway { 0%, 100% { transform: rotate(-5deg); } 50% { transform: rotate(9deg); } }
+@keyframes akilo-ear-twitch { 0%, 84%, 100% { transform: rotate(0deg); } 88% { transform: rotate(-9deg); } 92% { transform: rotate(3deg); } 96% { transform: rotate(0deg); } }
+@keyframes akilo-arm-idle { 0%, 100% { transform: rotate(-3deg); } 50% { transform: rotate(4deg); } }
+.akilo-torso { animation: akilo-breathe 3.4s ease-in-out infinite; }
+.akilo-head { animation: akilo-head-sway 6s ease-in-out infinite; }
+.akilo-tail { animation: akilo-tail-sway 3.2s ease-in-out infinite; }
+.akilo-ear-l { animation: akilo-ear-twitch 7s ease-in-out infinite; }
+.akilo-ear-r { animation: akilo-ear-twitch 7s ease-in-out 0.25s infinite; }
+.akilo-arm { animation: akilo-arm-idle 4.2s ease-in-out infinite; }
+.group:hover .akilo-head, .group:focus-within .akilo-head { animation-duration: 2.4s; }
+
+/* Branch: dips and swings whenever Akilo moves (same 7s clock as his peek-a-boo), and bounces when he hops out. */
+@keyframes akilo-branch-peek {
+  0%, 80%, 100% { transform: rotate(0deg) translateY(0); }
+  84% { transform: rotate(0.6deg) translateY(1px); }
+  88%, 94% { transform: rotate(-1.4deg) translateY(2.5px); }
+  97% { transform: rotate(0.5deg) translateY(-0.5px); }
+}
+@keyframes akilo-branch-bounce {
+  0% { transform: rotate(0deg) translateY(0); }
+  18% { transform: rotate(-2.4deg) translateY(4px); }
+  42% { transform: rotate(1.4deg) translateY(-1.5px); }
+  66% { transform: rotate(-0.7deg) translateY(1px); }
+  100% { transform: rotate(0deg) translateY(0); }
+}
+@keyframes akilo-branch-wave { 0%, 100% { transform: rotate(0deg); } 50% { transform: rotate(-0.8deg) translateY(1px); } }
+.akilo-branch { transform-origin: 100% 40%; animation: akilo-branch-peek 7s ease-in-out infinite; }
+.group:hover .akilo-branch, .group:focus-within .akilo-branch { animation: akilo-branch-bounce 0.9s ease-out 1, akilo-branch-wave 0.7s ease-in-out 0.9s infinite; }
+.akilo-branch-out { animation: akilo-branch-bounce 0.9s ease-out 1 !important; }
+
+@media (prefers-reduced-motion: reduce) {
+  .akilo-torso, .akilo-head, .akilo-tail, .akilo-ear-l, .akilo-ear-r, .akilo-arm, .akilo-branch, .akilo-branch-out { animation: none !important; }
+}

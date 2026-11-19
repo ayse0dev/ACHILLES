@@ -84,7 +84,7 @@ export default async function ReceiptPage({
 
             <article className="rounded-3xl overflow-hidden bg-white border-2 border-ink shadow-[0_14px_40px_rgba(27,19,64,0.15)]">
                 <header className="bg-ink text-white px-7 py-6 flex items-center justify-between gap-4">
-                    <img src="/logo.png" alt="ACHILLES" className="h-14 w-auto" />
+                    <img src="/logo-white.png" alt="ACHILLES" className="h-14 w-auto" />
                     <div className="text-right">
                         <p className="font-display font-black text-3xl tracking-wide">{receipt.title}</p>
                         <p className="font-mono font-bold text-yellow text-sm">{receipt.reference}</p>

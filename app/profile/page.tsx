@@ -2,6 +2,7 @@ import { requireUser } from "@/lib/requireUser";
 import ProfileForm from "@/components/ProfileForm";
 import AvatarUploader from "@/components/AvatarUploader";
 import { AddressSection, BankSection, PhoneSection } from "@/components/DeliveryProfile";
+import PasswordForm from "@/components/PasswordForm";
 import TransactionHistory from "@/components/TransactionHistory";
 import { base } from "@/lib/airtable";
 import { listAddresses } from "@/lib/addresses";
@@ -42,6 +43,10 @@ export default async function ProfilePage() {
 
                     <section>
                         <BankSection bank={fields.BankName ?? ""} holder={fields.BankHolder ?? ""} last4={fields.BankLast4 ?? ""} />
+                    </section>
+
+                    <section>
+                        <PasswordForm />
                     </section>
                 </div>
 

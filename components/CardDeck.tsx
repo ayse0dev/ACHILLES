@@ -5,7 +5,7 @@ import { useRouter } from "next/navigation";
 import { motion } from "framer-motion";
 import { useCallback, useEffect, useRef, useState } from "react";
 
-type Item = { href: string; title: string; text: string };
+type Item = { href: string; title: string; text: string; image?: string; fit?: "cover" | "contain" };
 
 const colors = ["#19b3c4", "#8b3fc7", "#ff7a3d", "#ffc83d", "#e8374f", "#19b3c4"];
 const PULL_DISTANCE = 140;
@@ -63,6 +63,7 @@ export default function CardDeck({ items }: { items: Item[] }) {
     }
 
     return (
+        <div className="grid md:grid-cols-[minmax(0,32rem)_minmax(0,1fr)] gap-10 lg:gap-16 items-center">
         <div className="space-y-5">
             <div
                 ref={ref}
@@ -70,7 +71,7 @@ export default function CardDeck({ items }: { items: Item[] }) {
                 onKeyDown={onKey}
                 role="group"
                 aria-label="Shortcuts deck. Scroll or use arrow keys to flip, drag a card out to open it."
-                className="relative mx-auto w-full max-w-xl h-[21rem] outline-none focus-visible:ring-2 ring-purple rounded-3xl"
+                className="relative w-full h-[18.5rem] outline-none focus-visible:ring-2 ring-purple rounded-3xl"
             >
                 {items.map((item, i) => {
                     const d = i - index;
@@ -100,7 +101,7 @@ export default function CardDeck({ items }: { items: Item[] }) {
                             }}
                             transition={{ type: "spring", stiffness: 220, damping: 24 }}
                             style={{ zIndex: count - Math.abs(d), borderColor: color, pointerEvents: passed || d > 4 ? "none" : "auto" }}
-                            className={`absolute inset-x-0 top-0 h-52 card border-t-4 p-7 select-none ${top ? "cursor-grab" : ""}`}
+                            className={`absolute inset-x-0 top-0 h-48 card border-t-4 p-7 select-none ${top ? "cursor-grab" : ""}`}
                         >
                             <div className="flex items-start justify-between gap-4">
                                 <h3 className="uppercase font-black text-xl">{item.title}</h3>
@@ -130,7 +131,7 @@ export default function CardDeck({ items }: { items: Item[] }) {
                 })}
             </div>
 
-            <div className="flex items-center justify-center gap-4">
+            <div className="flex items-center gap-4">
                 <button
                     onClick={() => go(index - 1)}
                     disabled={index === 0}
@@ -159,7 +160,27 @@ export default function CardDeck({ items }: { items: Item[] }) {
                     ↓
                 </button>
             </div>
-            <p className="text-center text-xs text-ink/50">Scroll over the deck to flip through. Drag a card out to open it.</p>
+            <p className="text-xs text-ink/50">Scroll over the deck to flip through. Drag a card out to open it.</p>
+        </div>
+
+        <Link
+            href={items[index]?.href ?? "/"}
+            aria-label={`Open ${items[index]?.title ?? ""}`}
+            className="relative block w-full max-w-md md:max-w-none mx-auto aspect-[4/3] overflow-hidden bg-[#f3f1ee]"
+        >
+            {items.map((item, i) =>
+                item.image ? (
+                    <img
+                        key={item.href}
+                        src={item.image}
+                        alt={i === index ? item.title : ""}
+                        aria-hidden={i !== index}
+                        className={`absolute inset-0 w-full h-full transition-opacity duration-500 ${item.fit === "contain" ? "object-contain p-6" : "object-cover"} ${i === index ? "opacity-100" : "opacity-0"}`}
+                    />
+                ) : null
+            )}
+            <span className="absolute bottom-0 left-0 bg-ink text-white text-xs font-bold uppercase tracking-wider px-4 py-2">{items[index]?.title}</span>
+        </Link>
         </div>
     );
 }

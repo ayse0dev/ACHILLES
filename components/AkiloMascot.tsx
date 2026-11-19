@@ -2,17 +2,27 @@ export default function AkiloMascot({ className = "" }: { className?: string }) 
     const ink = "#1b1340";
     return (
         <svg viewBox="0 0 170 210" className={className} aria-hidden="true">
-            <ellipse cx="80" cy="150" rx="40" ry="48" fill="#c99a6b" stroke={ink} strokeWidth="4" />
-            <ellipse cx="80" cy="160" rx="22" ry="30" fill="#e8c9a3" />
+            <g className="akilo-part akilo-tail" style={{ transformOrigin: "44px 140px" }}>
+                <path d="M44 140 C28 150 26 172 36 184" fill="none" stroke={ink} strokeWidth="9" strokeLinecap="round" />
+                <path d="M44 140 C28 150 26 172 36 184" fill="none" stroke="#c99a6b" strokeWidth="4" strokeLinecap="round" />
+            </g>
+            <g className="akilo-part akilo-torso" style={{ transformOrigin: "80px 198px" }}>
+                <ellipse cx="80" cy="150" rx="40" ry="48" fill="#c99a6b" stroke={ink} strokeWidth="4" />
+                <ellipse cx="80" cy="160" rx="22" ry="30" fill="#e8c9a3" />
+            </g>
             <ellipse cx="58" cy="196" rx="14" ry="8" fill="#c99a6b" stroke={ink} strokeWidth="4" />
             <ellipse cx="102" cy="196" rx="14" ry="8" fill="#c99a6b" stroke={ink} strokeWidth="4" />
-            <path d="M44 140 C28 150 26 172 36 184" fill="none" stroke={ink} strokeWidth="9" strokeLinecap="round" />
-            <path d="M44 140 C28 150 26 172 36 184" fill="none" stroke="#c99a6b" strokeWidth="4" strokeLinecap="round" />
 
-            <ellipse cx="42" cy="42" rx="16" ry="22" fill="#c99a6b" stroke={ink} strokeWidth="4" transform="rotate(-18 42 42)" />
-            <ellipse cx="42" cy="44" rx="8" ry="13" fill="#f4a9b8" transform="rotate(-18 42 42)" />
-            <ellipse cx="118" cy="42" rx="16" ry="22" fill="#c99a6b" stroke={ink} strokeWidth="4" transform="rotate(18 118 42)" />
-            <ellipse cx="118" cy="44" rx="8" ry="13" fill="#f4a9b8" transform="rotate(18 118 42)" />
+            <g className="akilo-part akilo-head" style={{ transformOrigin: "80px 122px" }}>
+
+            <g className="akilo-part akilo-ear-l" style={{ transformOrigin: "50px 56px" }}>
+                <ellipse cx="42" cy="42" rx="16" ry="22" fill="#c99a6b" stroke={ink} strokeWidth="4" transform="rotate(-18 42 42)" />
+                <ellipse cx="42" cy="44" rx="8" ry="13" fill="#f4a9b8" transform="rotate(-18 42 42)" />
+            </g>
+            <g className="akilo-part akilo-ear-r" style={{ transformOrigin: "110px 56px" }}>
+                <ellipse cx="118" cy="42" rx="16" ry="22" fill="#c99a6b" stroke={ink} strokeWidth="4" transform="rotate(18 118 42)" />
+                <ellipse cx="118" cy="44" rx="8" ry="13" fill="#f4a9b8" transform="rotate(18 118 42)" />
+            </g>
             <circle cx="80" cy="80" r="48" fill="#c99a6b" stroke={ink} strokeWidth="4" />
             <circle cx="54" cy="78" r="24" fill="#ffffff" stroke={ink} strokeWidth="4" />
             <circle cx="106" cy="78" r="24" fill="#ffffff" stroke={ink} strokeWidth="4" />
@@ -24,8 +34,9 @@ export default function AkiloMascot({ className = "" }: { className?: string }) 
             </g>
             <path d="M74 102 L86 102 L80 110 Z" fill="#5b3a29" />
             <path d="M68 116 Q80 128 92 116" fill="none" stroke={ink} strokeWidth="4" strokeLinecap="round" />
+            </g>
 
-            <g className="akilo-arm" style={{ transformOrigin: "116px 138px" }}>
+            <g className="akilo-part akilo-arm" style={{ transformOrigin: "116px 138px" }}>
                 <path d="M116 138 C140 134 150 112 146 92" fill="none" stroke={ink} strokeWidth="9" strokeLinecap="round" />
                 <path d="M116 138 C140 134 150 112 146 92" fill="none" stroke="#c99a6b" strokeWidth="4" strokeLinecap="round" />
                 <circle cx="146" cy="88" r="9" fill="#c99a6b" stroke={ink} strokeWidth="4" />
@@ -37,7 +48,7 @@ export default function AkiloMascot({ className = "" }: { className?: string }) 
 export function AkiloBranch({ className = "" }: { className?: string }) {
     const ink = "#1b1340";
     return (
-        <svg viewBox="0 0 220 70" className={className} aria-hidden="true">
+        <svg viewBox="0 0 220 70" className={`akilo-branch ${className}`} aria-hidden="true">
             <path d="M222 30 C170 28 120 36 70 40 C45 42 25 44 8 52" fill="none" stroke={ink} strokeWidth="18" strokeLinecap="round" />
             <path d="M222 30 C170 28 120 36 70 40 C45 42 25 44 8 52" fill="none" stroke="#8a5a36" strokeWidth="11" strokeLinecap="round" />
             <path d="M150 33 C146 20 138 14 130 10" fill="none" stroke={ink} strokeWidth="10" strokeLinecap="round" />

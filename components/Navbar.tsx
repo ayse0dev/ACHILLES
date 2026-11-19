@@ -43,7 +43,7 @@ export default function Navbar() {
         <header className="sticky top-0 z-40 bg-white/90 backdrop-blur border-b border-ink/10">
             <nav className="max-w-7xl mx-auto px-4 md:px-6 h-16 flex items-center justify-between gap-4">
                 <Link href={dashboard ? dashboard.href : "/"} className="shrink-0" aria-label="ACHILLES home">
-                    <img src="/logo.png" alt="ACHILLES" className="h-12 w-auto" />
+                    <img src="/logo.png" alt="ACHILLES" className="h-14 w-auto" />
                 </Link>
 
                 <ul className="hidden xl:flex items-center gap-5">
