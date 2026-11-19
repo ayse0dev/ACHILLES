@@ -1,6 +1,8 @@
 import { QRCodeSVG } from "qrcode.react";
 import Link from "next/link";
 
+const APK_URL = process.env.NEXT_PUBLIC_APK_URL ?? "";
+
 export default function DownloadPage() {
     const siteUrl = process.env.NEXT_PUBLIC_SITE_URL ?? "http://localhost:3000";
     const qrTarget = `${siteUrl}/get`;
@@ -10,9 +12,7 @@ export default function DownloadPage() {
             <div>
                 <p className="eyebrow mb-2">Take ACHILLES with you</p>
                 <h1 className="page-title">Get the mobile app</h1>
-                <p className="text-ink/70 mt-3">
-                    Scan the QR code with your phone camera, or tap a button below.
-                </p>
+                <p className="text-ink/70 mt-3">Scan the QR code with your phone camera, or choose your phone below.</p>
             </div>
 
             <div className="flex justify-center">
@@ -21,18 +21,22 @@ export default function DownloadPage() {
                 </div>
             </div>
 
-            <div className="flex flex-col sm:flex-row gap-3 justify-center">
-                <a href={process.env.NEXT_PUBLIC_APP_STORE_URL} className="btn btn-ink">
-                    Download on the App Store
-                </a>
-                <a href={process.env.NEXT_PUBLIC_PLAY_STORE_URL} className="btn btn-accent">
-                    Get it on Google Play
-                </a>
+            <div className="grid sm:grid-cols-2 gap-4 text-left">
+                <div className="border-2 border-ink p-5 space-y-3">
+                    <h2 className="font-black uppercase">Android</h2>
+                    {APK_URL ? (
+                        <a href={APK_URL} download className="btn btn-ink w-full justify-center">Download app (.apk)</a>
+                    ) : (
+                        <p className="text-sm font-bold text-orange">Download coming soon.</p>
+                    )}
+                    <p className="text-xs text-ink/60">Open the file after downloading and allow &ldquo;Install unknown apps&rdquo; if asked.</p>
+                </div>
+                <div className="border-2 border-ink p-5 space-y-3">
+                    <h2 className="font-black uppercase">iPhone</h2>
+                    <p className="text-sm text-ink/70">Open this site in Safari, tap Share, then <b>Add to Home Screen</b>.</p>
+                    <Link href="/get" className="underline font-bold text-sm">See the steps</Link>
+                </div>
             </div>
-
-            <p className="text-sm text-ink/60">
-                On your phone? <Link href="/get" className="underline font-bold">Tap here</Link> and we&apos;ll redirect you automatically.
-            </p>
         </div>
     );
 }
