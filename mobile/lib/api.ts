@@ -48,6 +48,7 @@ export async function api<T = any>(path: string, body?: unknown): Promise<T> {
     }
     const data = await res.json().catch(() => ({}));
     if (!res.ok) throw new ApiError(data?.error ?? "Something went wrong.", res.status);
+    if (body === undefined) cache.set(path, data);
     return data as T;
 }
 
@@ -71,7 +72,12 @@ export const priceOf = (p: { price: number; salePrice?: number }) =>
 export const peso = (n: number) => `₱${n.toLocaleString("en-PH", { minimumFractionDigits: 0, maximumFractionDigits: 2 })}`;
 
 // The shop's generated artwork is SVG, which phones cannot draw as an <Image>, so only real photos are returned.
-export function imageUrl(src?: string) {
+// Photos are served resized (and as webp) through the site's image optimizer so they load fast on mobile data.
+export function imageUrl(src?: string, width = 384) {
     if (!src || src.includes("/api/art/")) return null;
-    return src.startsWith("http") ? src : `${API_URL}${src}`;
+    if (src.startsWith("http")) return src;
+    return `${API_URL}/_next/image?url=${encodeURIComponent(src)}&w=${width}&q=75`;
 }
+
+const cache = new Map<string, any>();
+export const cachedGet = <T = any>(path: string): T | undefined => cache.get(path);

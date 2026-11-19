@@ -34,7 +34,7 @@ export default function Cart() {
                 ItemSeparatorComponent={() => <View style={{ height: 1, backgroundColor: colors.line, marginVertical: 12 }} />}
                 renderItem={({ item }) => (
                     <View style={{ flexDirection: "row", gap: 12 }}>
-                        <Photo src={item.image} name={item.name} style={{ width: 80, height: 80 }} />
+                        <Photo src={item.image} name={item.name} width={256} style={{ width: 80, height: 80 }} />
                         <View style={{ flex: 1 }}>
                             <Text style={{ fontWeight: "800", color: colors.ink }}>{item.name}</Text>
                             <Text style={{ color: colors.muted }}>Size {item.size}</Text>

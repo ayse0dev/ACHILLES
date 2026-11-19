@@ -25,7 +25,7 @@ export default function ProductScreen() {
 
     return (
         <ScrollView contentContainerStyle={{ paddingBottom: 40 }}>
-            <Photo src={p.images[photo]} name={p.name} style={{ width: "100%", aspectRatio: 1 }} />
+            <Photo src={p.images[photo]} name={p.name} width={828} style={{ width: "100%", aspectRatio: 1 }} />
             {p.images.length > 1 && (
                 <ScrollView horizontal contentContainerStyle={{ padding: 12, gap: 8 }}>
                     {p.images.map((img, i) => (

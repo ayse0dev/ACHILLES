@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { ActivityIndicator, FlatList, Pressable, ScrollView, Text, View } from "react-native";
 import { useRouter } from "expo-router";
-import { api, colors, type Product } from "../../lib/api";
+import { api, cachedGet, colors, type Product } from "../../lib/api";
 import { ProductCard, Title } from "../../components/ui";
 
 const cats = [
@@ -14,7 +14,7 @@ const cats = [
 
 export default function Home() {
     const router = useRouter();
-    const [products, setProducts] = useState<Product[] | null>(null);
+    const [products, setProducts] = useState<Product[] | null>(cachedGet<{ products: Product[] }>("/api/products?limit=8")?.products ?? null);
 
     useEffect(() => {
         api<{ products: Product[] }>("/api/products?limit=8").then((d) => setProducts(d.products)).catch(() => setProducts([]));

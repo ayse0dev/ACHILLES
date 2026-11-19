@@ -28,8 +28,8 @@ export function Button({
     );
 }
 
-export function Photo({ src, name, style }: { src?: string; name: string; style?: any }) {
-    const url = imageUrl(src);
+export function Photo({ src, name, style, width }: { src?: string; name: string; style?: any; width?: number }) {
+    const url = imageUrl(src, width);
     if (url) return <Image source={{ uri: url }} style={[{ backgroundColor: "#f3f1ee" }, style]} resizeMode="contain" />;
     return (
         <View style={[{ backgroundColor: "#f3f1ee", alignItems: "center", justifyContent: "center" }, style]}>

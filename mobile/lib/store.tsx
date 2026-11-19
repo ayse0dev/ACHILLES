@@ -41,12 +41,26 @@ export function StoreProvider({ children }: { children: React.ReactNode }) {
         (async () => {
             const t = await loadToken();
             if (t) {
+                const saved = await SecureStore.getItemAsync("achilles-user").catch(() => null);
+                let known: User | null = null;
+                try { known = saved ? JSON.parse(saved) : null; } catch {}
+                if (known) {
+                    setUser(known);
+                    await loadCart(known.id);
+                    setReady(true);
+                }
                 try {
                     const me = await api<{ user: User }>("/api/mobile/me");
                     setUser(me.user);
-                    await loadCart(me.user.id);
+                    SecureStore.setItemAsync("achilles-user", JSON.stringify(me.user)).catch(() => null);
+                    if (!known) await loadCart(me.user.id);
                 } catch (e: any) {
-                    if (e?.status === 401) await setToken(null);
+                    if (e?.status === 401) {
+                        await setToken(null);
+                        await SecureStore.deleteItemAsync("achilles-user").catch(() => null);
+                        setUser(null);
+                        setCart([]);
+                    }
                 }
             }
             setReady(true);
@@ -65,11 +79,13 @@ export function StoreProvider({ children }: { children: React.ReactNode }) {
             cart,
             signIn: async (token, u) => {
                 await setToken(token);
+                SecureStore.setItemAsync("achilles-user", JSON.stringify(u)).catch(() => null);
                 setUser(u);
                 await loadCart(u.id);
             },
             signOut: async () => {
                 await setToken(null);
+                SecureStore.deleteItemAsync("achilles-user").catch(() => null);
                 setUser(null);
                 setCart([]);
             },
