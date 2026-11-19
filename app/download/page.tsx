@@ -4,7 +4,7 @@ import { headers } from "next/headers";
 
 export const dynamic = "force-dynamic";
 
-const APK_URL = process.env.NEXT_PUBLIC_APK_URL ?? "";
+const APK_URL = process.env.NEXT_PUBLIC_APK_URL ?? "/achilles.apk";
 
 export default async function DownloadPage() {
     const h = await headers();

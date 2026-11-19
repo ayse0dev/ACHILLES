@@ -26,6 +26,17 @@
       "expo-web-browser",
       "expo-font"
     ],
-    "scheme": "achilles"
+    "scheme": "achilles",
+    "extra": {
+      "router": {
+        "asyncRoutes": {
+          "web": true
+        }
+      },
+      "eas": {
+        "projectId": "459c34df-f923-48c6-b176-2b55cb00e338"
+      }
+    },
+    "owner": "ayse0dev"
   }
 }

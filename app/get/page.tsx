@@ -3,7 +3,7 @@ import Link from "next/link";
 
 export const dynamic = "force-dynamic";
 
-const APK_URL = process.env.NEXT_PUBLIC_APK_URL ?? "";
+const APK_URL = process.env.NEXT_PUBLIC_APK_URL ?? "/achilles.apk";
 
 export default async function GetAppPage() {
     const ua = (await headers()).get("user-agent") ?? "";
