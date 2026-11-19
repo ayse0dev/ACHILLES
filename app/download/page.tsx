@@ -1,10 +1,16 @@
 import { QRCodeSVG } from "qrcode.react";
 import Link from "next/link";
+import { headers } from "next/headers";
+
+export const dynamic = "force-dynamic";
 
 const APK_URL = process.env.NEXT_PUBLIC_APK_URL ?? "";
 
-export default function DownloadPage() {
-    const siteUrl = process.env.NEXT_PUBLIC_SITE_URL ?? "http://localhost:3000";
+export default async function DownloadPage() {
+    const h = await headers();
+    const host = h.get("x-forwarded-host") ?? h.get("host") ?? "localhost:3000";
+    const proto = h.get("x-forwarded-proto") ?? (host.startsWith("localhost") ? "http" : "https");
+    const siteUrl = `${proto}://${host}`;
     const qrTarget = `${siteUrl}/get`;
 
     return (
