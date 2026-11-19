@@ -10,8 +10,16 @@ function hash(token: string) {
     return crypto.createHash("sha256").update(token).digest("hex");
 }
 
+// Links in emails (verify, reset) must point at the live site. NEXTAUTH_URL wins when it is a real address;
+// on Vercel, a missing or localhost value falls back to the deployment's own domain.
 export function appUrl() {
-    return (process.env.NEXTAUTH_URL ?? "http://localhost:3000").replace(/\/$/, "");
+    const explicit = process.env.NEXTAUTH_URL?.trim().replace(/\/$/, "");
+    const local = !explicit || /localhost|127\.0\.0\.1/.test(explicit);
+    if (local && process.env.VERCEL) {
+        const host = process.env.VERCEL_PROJECT_PRODUCTION_URL ?? process.env.VERCEL_URL;
+        if (host) return `https://${host}`;
+    }
+    return explicit || "http://localhost:3000";
 }
 
 export function newVerification() {
